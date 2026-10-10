@@ -1,0 +1,48 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    match /vendedores/{vendedorId} {
+      allow read: if signedIn();
+      allow create, update: if signedIn()
+        && request.resource.data.keys()
+          .hasOnly(['nome', 'email', 'telefone', 'ativo', 'createdAt', 'updatedAt'])
+        && request.resource.data.nome is string
+        && request.resource.data.ativo is bool
+        && (request.resource.data.email == null || request.resource.data.email is string)
+        && (request.resource.data.telefone == null || request.resource.data.telefone is string);
+      // Sem delete: inativar via `ativo = false` preserva o histórico de vendas.
+
+      match /metas/{competencia} {
+        allow read: if signedIn();
+        allow create, update: if signedIn()
+          && request.resource.data.categorias is map
+          && request.resource.data.competencia is string;
+      }
+    }
+
+    match /metasLoja/{competencia} {
+      allow read: if signedIn();
+      allow create, update: if signedIn()
+        && request.resource.data.categorias is map
+        && request.resource.data.competencia is string;
+    }
+
+    match /vendas/{vendaId} {
+      allow read: if signedIn();
+      allow create, update: if signedIn()
+        && request.resource.data.vendedorId is string
+        && request.resource.data.categoria in
+          ['POS', 'CONTROLE', 'FIXA', 'APARELHO', 'ACESSORIOS', 'NOVOS_NEGOCIOS', 'SVA']
+        && request.resource.data.quantidade is number
+        && request.resource.data.quantidade >= 0
+        && (request.resource.data.valor == null || request.resource.data.valor is number)
+        && request.resource.data.data is timestamp;
+      allow delete: if signedIn();
+    }
+  }
+}
