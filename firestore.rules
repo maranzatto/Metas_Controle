@@ -1,0 +1,82 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function ownsVendedor(vendedorId) {
+      return signedIn()
+        && exists(/databases/$(database)/documents/vendedores/$(vendedorId))
+        && get(/databases/$(database)/documents/vendedores/$(vendedorId)).data.uid == request.auth.uid;
+    }
+
+    function validVenda(data) {
+      return data.vendedorId is string
+        && data.categoria in
+          ['POS', 'CONTROLE', 'FIXA', 'APARELHO', 'ACESSORIOS', 'NOVOS_NEGOCIOS', 'SVA']
+        && data.quantidade is number
+        && data.quantidade >= 0
+        && (data.valor == null || data.valor is number)
+        && data.data is timestamp;
+    }
+
+    match /vendedores/{vendedorId} {
+      allow read: if signedIn() && resource.data.uid == request.auth.uid;
+      allow create: if signedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys()
+          .hasOnly(['uid', 'nome', 'email', 'telefone', 'ativo', 'createdAt', 'updatedAt'])
+        && request.resource.data.nome is string
+        && request.resource.data.ativo is bool
+        && (request.resource.data.email == null || request.resource.data.email is string)
+        && (request.resource.data.telefone == null || request.resource.data.telefone is string);
+      allow update: if signedIn()
+        && resource.data.uid == request.auth.uid
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.keys()
+          .hasOnly(['uid', 'nome', 'email', 'telefone', 'ativo', 'createdAt', 'updatedAt'])
+        && request.resource.data.nome is string
+        && request.resource.data.ativo is bool
+        && (request.resource.data.email == null || request.resource.data.email is string)
+        && (request.resource.data.telefone == null || request.resource.data.telefone is string);
+      // Sem delete: inativar via `ativo = false` preserva o histórico de vendas.
+
+      match /metas/{competencia} {
+        allow read: if ownsVendedor(vendedorId);
+        allow create, update: if ownsVendedor(vendedorId)
+          && request.resource.data.categorias is map
+          && request.resource.data.competencia is string;
+      }
+    }
+
+    match /metasLoja/{competencia} {
+      allow read: if signedIn() && resource.data.uid == request.auth.uid;
+      allow create: if signedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.categorias is map
+        && request.resource.data.competencia is string;
+      allow update: if signedIn()
+        && resource.data.uid == request.auth.uid
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.categorias is map
+        && request.resource.data.competencia is string;
+    }
+
+    match /vendas/{vendaId} {
+      allow read: if signedIn() && resource.data.uid == request.auth.uid;
+      allow create: if signedIn()
+        && request.resource.data.uid == request.auth.uid
+        && ownsVendedor(request.resource.data.vendedorId)
+        && validVenda(request.resource.data);
+      allow update: if signedIn()
+        && resource.data.uid == request.auth.uid
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.vendedorId == resource.data.vendedorId
+        && ownsVendedor(request.resource.data.vendedorId)
+        && validVenda(request.resource.data);
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+    }
+  }
+}

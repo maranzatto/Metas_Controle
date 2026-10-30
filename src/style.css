@@ -1,0 +1,95 @@
+@import 'tailwindcss';
+
+@theme {
+    --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+
+    /* Paleta roxa da marca */
+    --color-brand-50: #faf5ff;
+    --color-brand-100: #f3e8ff;
+    --color-brand-200: #e9d5ff;
+    --color-brand-300: #d8b4fe;
+    --color-brand-400: #c084fc;
+    --color-brand-500: #a855f7;
+    --color-brand-600: #9333ea;
+    --color-brand-700: #7e22ce;
+    --color-brand-800: #660099;
+    --color-brand-900: #4c0073;
+    --color-brand-950: #2d0045;
+}
+
+/* ---- animações ---- */
+@keyframes blob {
+
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    33% {
+        transform: translate(40px, -50px) scale(1.12);
+    }
+
+    66% {
+        transform: translate(-30px, 30px) scale(0.92);
+    }
+}
+
+@keyframes fade-up {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes gradient-pan {
+
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+.animate-blob {
+    animation: blob 14s ease-in-out infinite;
+}
+
+.animate-fade-up {
+    animation: fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-gradient-pan {
+    background-size: 200% 200%;
+    animation: gradient-pan 8s ease infinite;
+}
+
+/* ---- vidro ---- */
+.glass {
+    background: rgb(255 255 255 / 0.08);
+    backdrop-filter: blur(22px) saturate(140%);
+    -webkit-backdrop-filter: blur(22px) saturate(140%);
+    border: 1px solid rgb(255 255 255 / 0.18);
+}
+
+.glass-light {
+    background: rgb(255 255 255 / 0.72);
+    backdrop-filter: blur(18px) saturate(150%);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+}
+
+::selection {
+    background: var(--color-brand-200);
+    color: var(--color-brand-900);
+}
+
+body {
+    background: #faf7ff;
+}
