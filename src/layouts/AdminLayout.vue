@@ -8,15 +8,30 @@ const route = useRoute()
 const router = useRouter()
 const sidebarAberta = ref(false)
 
-const links = [
+interface LinkNavegacao {
+  to: string
+  label: string
+  exato?: boolean
+  children?: { to: string; label: string }[]
+}
+
+const links: LinkNavegacao[] = [
   { to: '/', label: 'Home', exato: true },
   { to: '/vendas', label: 'Vendas' },
   { to: '/vendedores', label: 'Vendedores' },
   { to: '/metas', label: 'Metas' },
-  { to: '/conferencia', label: 'Conferência' },
+  {
+    to: '/conferencia/chip',
+    label: 'Conferência',
+    children: [
+      { to: '/conferencia/chip', label: 'Chip' },
+      { to: '/conferencia/pelicula', label: 'Película' },
+    ],
+  },
 ]
 
-function ativo(link: (typeof links)[number]) {
+function ativo(link: LinkNavegacao) {
+  if (link.children) return route.path.startsWith('/conferencia')
   return link.exato ? route.path === link.to : route.path.startsWith(link.to)
 }
 
@@ -30,7 +45,7 @@ async function sair() {
 </script>
 
 <template>
-  <div class="flex min-h-screen bg-gradient-to-br from-brand-50 via-white to-fuchsia-50">
+  <div class="flex min-h-screen bg-brand-50">
     <!-- overlay mobile -->
     <div
       v-if="sidebarAberta"
@@ -39,12 +54,12 @@ async function sair() {
     />
 
     <aside
-      class="fixed inset-y-0 left-0 z-40 flex w-64 -translate-x-full flex-col bg-gradient-to-b from-brand-950 via-brand-800 to-[#8a2be2]/90 text-brand-100 shadow-2xl shadow-brand-950/30 transition-transform duration-300 lg:sticky lg:top-0 lg:h-screen lg:shrink-0 lg:translate-x-0"
+      class="fixed inset-y-0 left-0 z-40 flex w-64 -translate-x-full flex-col bg-brand-950 text-brand-100 shadow-xl shadow-brand-950/15 transition-transform duration-300 lg:sticky lg:top-0 lg:h-screen lg:shrink-0 lg:translate-x-0"
       :class="{ 'translate-x-0': sidebarAberta }"
     >
       <div class="flex h-16 items-center gap-3 border-b border-white/10 px-5">
         <div
-          class="animate-gradient-pan flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-fuchsia-400 to-violet-600 shadow-lg shadow-fuchsia-500/30"
+          class="flex size-9 items-center justify-center rounded-xl bg-vivo-500"
         >
           <svg class="size-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 17l6-6 4 4 8-8" />
@@ -55,30 +70,42 @@ async function sair() {
       </div>
 
       <nav class="flex-1 space-y-1.5 overflow-y-auto px-3 py-5">
-        <RouterLink
-          v-for="link in links"
-          :key="link.to"
+        <div v-for="link in links" :key="link.to" class="space-y-1">
+          <RouterLink
           :to="link.to"
           class="group relative block rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200"
           :class="
             ativo(link)
               ? 'bg-white/15 text-white shadow-inner shadow-white/5'
-              : 'text-brand-200 hover:bg-white/10 hover:text-white'
+              : 'text-brand-200 hover:bg-white/8 hover:text-white'
           "
           @click="sidebarAberta = false"
         >
           <span
             v-if="ativo(link)"
-            class="absolute top-1/2 left-0 h-5 w-1 -translate-y-1/2 rounded-r-full bg-fuchsia-400"
+            class="absolute top-1/2 left-0 h-5 w-1 -translate-y-1/2 rounded-r-full bg-vivo-500"
           />
           {{ link.label }}
-        </RouterLink>
+          </RouterLink>
+          <div v-if="link.children && ativo(link)" class="ml-4 space-y-1 border-l border-white/15 pl-3">
+            <RouterLink
+              v-for="child in link.children"
+              :key="child.to"
+              :to="child.to"
+              class="block rounded-lg px-3 py-2 text-sm transition-colors"
+              :class="route.path === child.to ? 'bg-white/10 font-semibold text-white' : 'text-brand-300 hover:bg-white/5 hover:text-white'"
+              @click="sidebarAberta = false"
+            >
+              {{ child.label }}
+            </RouterLink>
+          </div>
+        </div>
       </nav>
 
       <div class="border-t border-white/10 p-4">
         <div class="flex items-center gap-3 rounded-xl bg-white/10 p-3 backdrop-blur">
           <div
-            class="flex size-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-fuchsia-400 to-brand-500 text-sm font-bold text-white"
+            class="flex size-9 shrink-0 items-center justify-center rounded-full bg-brand-700 text-sm font-bold text-white"
           >
             {{ inicial }}
           </div>
@@ -108,7 +135,7 @@ async function sair() {
           ☰
         </button>
         <h1
-          class="bg-gradient-to-r from-brand-900 via-brand-700 to-fuchsia-600 bg-clip-text text-lg font-extrabold tracking-tight text-transparent"
+          class="text-lg font-extrabold tracking-tight text-brand-900"
         >
           {{ route.meta.title }}
         </h1>

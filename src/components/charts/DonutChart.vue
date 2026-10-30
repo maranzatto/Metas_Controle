@@ -37,7 +37,7 @@ const legenda = computed(() =>
 <template>
   <div class="flex h-full flex-col items-center justify-center gap-5 sm:flex-row sm:gap-8">
     <svg viewBox="0 0 200 200" class="size-48 shrink-0">
-      <circle cx="100" cy="100" :r="R" fill="none" stroke="#f3e8ff" stroke-width="30" />
+      <circle cx="100" cy="100" :r="R" fill="none" stroke="#eaf0f5" stroke-width="30" />
       <circle
         v-for="(s, i) in segmentos"
         :key="i"

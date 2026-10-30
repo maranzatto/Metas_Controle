@@ -38,7 +38,7 @@ const PERIODOS: { valor: Periodo; label: string }[] = [
   { valor: 'mes', label: 'Mês' },
 ]
 
-const CORES = ['#660099', '#9333ea', '#c026d3', '#7c3aed', '#d946ef', '#a855f7', '#e879f9']
+const CORES = ['#315f7e', '#168a9a', '#548b7c', '#73899b', '#a0a9b5', '#4f8795', '#7f927a']
 
 /* ---- KPIs (todos em R$, pois as metas são monetárias) ---- */
 const totalValor = computed(() => vendas.value.reduce((acc, v) => acc + (v.valor ?? 0), 0))
@@ -149,7 +149,7 @@ onMounted(async () => {
             class="cursor-pointer rounded-lg px-4 py-1.5 text-sm font-bold transition-all duration-200"
             :class="
               periodo === p.valor
-                ? 'bg-gradient-to-r from-brand-700 to-fuchsia-600 text-white shadow-md shadow-brand-500/30'
+                ? 'bg-brand-700 text-white shadow-sm'
                 : 'text-brand-700/70 hover:text-brand-800'
             "
             @click="periodo = p.valor"
@@ -171,7 +171,7 @@ onMounted(async () => {
       >
         <div class="flex items-center gap-3">
           <div
-            class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-md shadow-emerald-500/30"
+            class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700"
           >
             <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
           </div>
@@ -187,7 +187,7 @@ onMounted(async () => {
       >
         <div class="flex items-center gap-3">
           <div
-            class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-fuchsia-500 text-white shadow-md shadow-brand-500/30"
+            class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-sky-100 text-sky-700"
           >
             <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
           </div>
@@ -203,7 +203,7 @@ onMounted(async () => {
       >
         <div class="flex items-center gap-3">
           <div
-            class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-brand-700 text-white shadow-md shadow-violet-500/30"
+            class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-800"
           >
             <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg>
           </div>
@@ -219,7 +219,7 @@ onMounted(async () => {
       >
         <div class="flex items-center gap-3">
           <div
-            class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-fuchsia-500 to-pink-500 text-white shadow-md shadow-fuchsia-500/30"
+            class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-100 text-brand-700"
           >
             <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           </div>

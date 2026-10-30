@@ -25,7 +25,7 @@ const emit = defineEmits<{ close: [] }>()
             class="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 border-b border-brand-100 bg-white/90 px-6 py-4 backdrop-blur"
           >
             <h2
-              class="bg-gradient-to-r from-brand-800 to-fuchsia-600 bg-clip-text text-lg font-bold text-transparent"
+              class="text-lg font-bold text-brand-800"
             >
               {{ title }}
             </h2>

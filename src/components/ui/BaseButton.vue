@@ -15,7 +15,7 @@ withDefaults(
     :disabled="disabled"
     class="inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-xl px-4 py-2 text-sm font-semibold transition-all duration-200 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50"
     :class="{
-      'bg-gradient-to-r from-brand-700 via-brand-600 to-fuchsia-600 text-white shadow-lg shadow-brand-500/30 hover:shadow-xl hover:shadow-brand-500/40 hover:brightness-110':
+      'bg-brand-700 text-white shadow-sm shadow-brand-900/10 hover:bg-brand-800':
         variant === 'primary',
       'border border-brand-200 bg-white text-brand-800 hover:border-brand-300 hover:bg-brand-50':
         variant === 'secondary',

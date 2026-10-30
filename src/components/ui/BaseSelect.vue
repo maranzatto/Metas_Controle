@@ -10,7 +10,7 @@ const model = defineModel<string>({ default: '' })
 <template>
   <label class="block text-sm">
     <span v-if="label" class="mb-1.5 block font-semibold text-brand-950/80">
-      {{ label }}<span v-if="required" class="text-fuchsia-500"> *</span>
+      {{ label }}<span v-if="required" class="text-rose-600"> *</span>
     </span>
     <select
       v-model="model"

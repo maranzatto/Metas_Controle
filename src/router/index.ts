@@ -56,8 +56,19 @@ export const router = createRouter({
         {
           path: 'conferencia',
           name: 'conferencia',
+          redirect: { name: 'conferencia-chip' },
+        },
+        {
+          path: 'conferencia/chip',
+          name: 'conferencia-chip',
           component: () => import('@/features/conferencia/ConferenciaView.vue'),
-          meta: { title: 'Conferência' },
+          meta: { title: 'Conferência · Chip' },
+        },
+        {
+          path: 'conferencia/pelicula',
+          name: 'conferencia-pelicula',
+          component: () => import('@/features/conferencia/ConferenciaPeliculaView.vue'),
+          meta: { title: 'Conferência · Película' },
         },
       ],
     },

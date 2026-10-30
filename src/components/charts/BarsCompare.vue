@@ -44,8 +44,8 @@ const linhasGuia = computed(() => [0.25, 0.5, 0.75, 1].map((f) => BASE - f * ALT
     <svg :viewBox="`0 0 ${W} ${H}`" class="min-w-[560px]">
       <defs>
         <linearGradient id="gradBar" x1="0" y1="1" x2="0" y2="0">
-          <stop offset="0%" stop-color="#660099" />
-          <stop offset="100%" stop-color="#d946ef" />
+          <stop offset="0%" stop-color="#315f7e" />
+          <stop offset="100%" stop-color="#168a9a" />
         </linearGradient>
       </defs>
 
@@ -57,10 +57,10 @@ const linhasGuia = computed(() => [0.25, 0.5, 0.75, 1].map((f) => BASE - f * ALT
         :x2="W"
         :y1="y"
         :y2="y"
-        stroke="#f3e8ff"
+        stroke="#eaf0f5"
         stroke-width="1"
       />
-      <line x1="0" :x2="W" :y1="BASE" :y2="BASE" stroke="#e9d5ff" stroke-width="1.5" />
+      <line x1="0" :x2="W" :y1="BASE" :y2="BASE" stroke="#d5e1eb" stroke-width="1.5" />
 
       <g v-for="(b, i) in barras" :key="i">
         <!-- meta (fundo claro) -->
@@ -70,7 +70,7 @@ const linhasGuia = computed(() => [0.25, 0.5, 0.75, 1].map((f) => BASE - f * ALT
           :width="barraW"
           :height="b.hM"
           rx="5"
-          fill="#e9d5ff"
+          fill="#d5e1eb"
         >
           <title>Meta 100% — {{ b.label }}: {{ fmt(b.meta) }}</title>
         </rect>
@@ -100,7 +100,7 @@ const linhasGuia = computed(() => [0.25, 0.5, 0.75, 1].map((f) => BASE - f * ALT
 
     <div class="mt-2 flex items-center gap-5 text-xs text-brand-900/60">
       <span class="flex items-center gap-1.5">
-        <span class="size-3 rounded-sm bg-gradient-to-t from-brand-800 to-fuchsia-500" /> Realizado
+        <span class="size-3 rounded-sm bg-gradient-to-t from-brand-700 to-vivo-500" /> Realizado
       </span>
       <span class="flex items-center gap-1.5">
         <span class="size-3 rounded-sm bg-brand-200" /> Meta 100%

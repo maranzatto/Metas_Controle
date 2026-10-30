@@ -74,7 +74,7 @@ const FAIXA_TEXTO = {
             class="cursor-pointer rounded-lg px-4 py-1.5 text-sm font-bold transition-all duration-200"
             :class="
               periodo === p.valor
-                ? 'bg-gradient-to-r from-brand-700 to-fuchsia-600 text-white shadow-md shadow-brand-500/30'
+                ? 'bg-brand-700 text-white shadow-sm'
                 : 'text-brand-700/70 hover:text-brand-800'
             "
             @click="periodo = p.valor"
@@ -93,7 +93,7 @@ const FAIXA_TEXTO = {
             class="cursor-pointer rounded-lg px-4 py-1.5 text-sm font-bold transition-all duration-200"
             :class="
               visao === o.valor
-                ? 'bg-gradient-to-r from-brand-700 to-fuchsia-600 text-white shadow-md shadow-brand-500/30'
+                ? 'bg-brand-700 text-white shadow-sm'
                 : 'text-brand-700/70 hover:text-brand-800'
             "
             @click="visao = o.valor"

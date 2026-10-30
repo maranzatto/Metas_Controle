@@ -3,18 +3,20 @@
 @theme {
     --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
 
-    /* Paleta roxa da marca */
-    --color-brand-50: #faf5ff;
-    --color-brand-100: #f3e8ff;
-    --color-brand-200: #e9d5ff;
-    --color-brand-300: #d8b4fe;
-    --color-brand-400: #c084fc;
-    --color-brand-500: #a855f7;
-    --color-brand-600: #9333ea;
-    --color-brand-700: #7e22ce;
-    --color-brand-800: #660099;
-    --color-brand-900: #4c0073;
-    --color-brand-950: #2d0045;
+    /* Azul institucional suave com neutros frios. */
+    --color-brand-50: #f5f8fb;
+    --color-brand-100: #eaf0f5;
+    --color-brand-200: #d5e1eb;
+    --color-brand-300: #b6cadb;
+    --color-brand-400: #8eacc5;
+    --color-brand-500: #648eae;
+    --color-brand-600: #477595;
+    --color-brand-700: #315f7e;
+    --color-brand-800: #244c68;
+    --color-brand-900: #1b3c54;
+    --color-brand-950: #122b3e;
+    --color-vivo-500: #168a9a;
+    --color-vivo-600: #127383;
 }
 
 /* ---- animações ---- */
@@ -91,5 +93,5 @@
 }
 
 body {
-    background: #faf7ff;
+    background: #f5f7fa;
 }
