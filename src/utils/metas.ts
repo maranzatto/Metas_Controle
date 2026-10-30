@@ -26,6 +26,11 @@ export function proporcaoPeriodo(periodo: Periodo, competencia: string): number 
   return total === 0 ? 0 : alvo / total
 }
 
+/** Calcula a meta de 80% a partir da meta de 100%, arredondando para centavos. */
+export function calcularMeta80(meta100: number): number {
+  return Math.round(meta100 * 0.8 * 100) / 100
+}
+
 /** Converte meta mensal em meta do período, arredondada para 2 casas. */
 export function metaDoPeriodo(metaMensal: number, periodo: Periodo, competencia: string): number {
   return Math.round(metaMensal * proporcaoPeriodo(periodo, competencia) * 100) / 100

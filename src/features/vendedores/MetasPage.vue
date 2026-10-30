@@ -7,7 +7,7 @@ import type { MetasPorCategoria } from '@/types'
 import { competenciaAtual } from '@/utils/date'
 import { formatarCompetencia } from '@/utils/format'
 import { moedaParaInput, parseMoeda } from '@/utils/masks'
-import { metasValidas, metasVazias } from '@/utils/metas'
+import { calcularMeta80, metasValidas, metasVazias } from '@/utils/metas'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 
@@ -24,6 +24,7 @@ const vendedor = computed(() => store.porId.get(vendedorId))
 const competencia = ref(competenciaAtual())
 // O formulário trabalha com strings mascaradas ("1.234,56"); converte para number ao salvar.
 const metas = ref<Record<Categoria, { meta80: string; meta100: string }>>(formVazio())
+const meta80Automatica = ref<Record<Categoria, boolean>>(automaticoPorCategoria())
 const carregando = ref(true)
 const erro = ref('')
 const salvando = ref(false)
@@ -32,6 +33,36 @@ function formVazio() {
   const m = {} as Record<Categoria, { meta80: string; meta100: string }>
   for (const c of CATEGORIAS) m[c] = { meta80: '', meta100: '' }
   return m
+}
+
+function automaticoPorCategoria(valor = true) {
+  const estado = {} as Record<Categoria, boolean>
+  for (const categoria of CATEGORIAS) estado[categoria] = valor
+  return estado
+}
+
+function atualizarMeta80Automatica(categoria: Categoria) {
+  const meta100 = metas.value[categoria].meta100
+  if (!meta100.trim()) {
+    metas.value[categoria].meta80 = ''
+    return
+  }
+  metas.value[categoria].meta80 = moedaParaInput(calcularMeta80(parseMoeda(meta100)))
+}
+
+function alterarMeta100(categoria: Categoria, valor: string | number) {
+  metas.value[categoria].meta100 = String(valor)
+  if (meta80Automatica.value[categoria]) atualizarMeta80Automatica(categoria)
+}
+
+function alterarMeta80(categoria: Categoria, valor: string | number) {
+  metas.value[categoria].meta80 = String(valor)
+  meta80Automatica.value[categoria] = false
+}
+
+function ativarMeta80Automatica(categoria: Categoria) {
+  meta80Automatica.value[categoria] = true
+  atualizarMeta80Automatica(categoria)
 }
 
 function paraNumeros(): MetasPorCategoria {
@@ -51,13 +82,19 @@ async function carregarMetas() {
       : store.buscarMetas(vendedorId, competencia.value))
   )?.categorias
   const form = formVazio()
+  const automatico = automaticoPorCategoria()
   if (salvas) {
     for (const c of CATEGORIAS) {
       form[c].meta80 = salvas[c]?.meta80 ? moedaParaInput(salvas[c].meta80) : ''
       form[c].meta100 = salvas[c]?.meta100 ? moedaParaInput(salvas[c].meta100) : ''
+      automatico[c] = !salvas[c]?.meta80
+      if (automatico[c] && form[c].meta100) {
+        form[c].meta80 = moedaParaInput(calcularMeta80(parseMoeda(form[c].meta100)))
+      }
     }
   }
   metas.value = form
+  meta80Automatica.value = automatico
   carregando.value = false
 }
 
@@ -142,14 +179,27 @@ async function salvar() {
         >
           <h3 class="mb-4 font-bold text-brand-950">{{ CATEGORIA_LABELS[c] }}</h3>
           <div class="grid grid-cols-2 gap-3">
+            <div>
+              <BaseInput
+                :model-value="metas[c].meta80"
+                @update:model-value="alterarMeta80(c, $event)"
+                label="Meta 80% (R$)"
+                mask="currency"
+                placeholder="0,00"
+              />
+              <button
+                v-if="!meta80Automatica[c]"
+                type="button"
+                class="mt-1 text-left text-xs font-semibold text-brand-700 hover:text-brand-900"
+                @click="ativarMeta80Automatica(c)"
+              >
+                Calcular automaticamente
+              </button>
+              <p v-else class="mt-1 text-xs text-brand-500">80% da meta de 100%</p>
+            </div>
             <BaseInput
-              v-model="metas[c].meta80"
-              label="Meta 80% (R$)"
-              mask="currency"
-              placeholder="0,00"
-            />
-            <BaseInput
-              v-model="metas[c].meta100"
+              :model-value="metas[c].meta100"
+              @update:model-value="alterarMeta100(c, $event)"
               label="Meta 100% (R$)"
               mask="currency"
               placeholder="0,00"

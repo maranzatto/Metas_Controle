@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  calcularMeta80,
   faixaAtingimento,
   metaDoPeriodo,
   metasValidas,
@@ -15,6 +16,13 @@ import type { MetasPorCategoria } from '@/types'
 
 // Outubro/2026 tem 31 dias.
 const COMP = '2026-10'
+
+describe('calcularMeta80', () => {
+  it('calcula 80% da meta de 100% com arredondamento para centavos', () => {
+    expect(calcularMeta80(1000)).toBe(800)
+    expect(calcularMeta80(10.01)).toBe(8.01)
+  })
+})
 
 describe('proporcaoPeriodo (regra: dias corridos)', () => {
   it('mês retorna 100% da meta', () => {
