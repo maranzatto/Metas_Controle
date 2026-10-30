@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { FirebaseError } from 'firebase/app'
 import { useRouter } from 'vue-router'
 import { useVendedoresStore } from '@/stores/vendedores'
 import type { Vendedor } from '@/types'
@@ -11,8 +12,26 @@ const router = useRouter()
 
 const formAberto = ref(false)
 const selecionado = ref<Vendedor | null>(null)
+const erroCarregamento = ref('')
 
-onMounted(() => store.carregar())
+async function carregar() {
+  erroCarregamento.value = ''
+  try {
+    await store.carregar()
+  } catch (error) {
+    if (error instanceof FirebaseError && error.code === 'failed-precondition') {
+      erroCarregamento.value = 'O índice de vendedores ainda não está disponível. Publique os índices do Firestore.'
+    } else if (error instanceof FirebaseError && error.code === 'permission-denied') {
+      erroCarregamento.value = 'O Firestore negou a consulta. Confira se o ownerUid do documento corresponde ao usuário autenticado.'
+    } else if (error instanceof FirebaseError) {
+      erroCarregamento.value = `Falha ao carregar vendedores (${error.code}).`
+    } else {
+      erroCarregamento.value = 'Não foi possível carregar os vendedores.'
+    }
+  }
+}
+
+onMounted(carregar)
 
 function novo() {
   selecionado.value = null
@@ -38,6 +57,10 @@ function editarMetas(v: Vendedor) {
       <BaseButton @click="novo">+ Novo vendedor</BaseButton>
     </div>
 
+    <p v-if="erroCarregamento" class="text-sm font-medium text-rose-600">
+      {{ erroCarregamento }}
+    </p>
+
     <section
       class="overflow-x-auto rounded-2xl border border-brand-100 bg-white shadow-sm shadow-brand-100"
     >
@@ -61,6 +84,11 @@ function editarMetas(v: Vendedor) {
         <tbody>
           <tr v-if="store.carregando">
             <td colspan="4" class="px-5 py-10 text-center text-brand-300">Carregando…</td>
+          </tr>
+          <tr v-else-if="erroCarregamento">
+            <td colspan="4" class="px-5 py-10 text-center text-rose-600">
+              A listagem não foi carregada.
+            </td>
           </tr>
           <tr v-else-if="store.lista.length === 0">
             <td colspan="4" class="px-5 py-10 text-center text-brand-300">
