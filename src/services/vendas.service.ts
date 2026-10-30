@@ -3,10 +3,7 @@ import {
   collection,
   deleteDoc,
   doc,
-<<<<<<< HEAD
   getDoc,
-=======
->>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
   getDocs,
   orderBy,
   query,
@@ -17,54 +14,40 @@ import {
   type DocumentData,
 } from 'firebase/firestore'
 import { db } from '@/firebase'
-<<<<<<< HEAD
 import { requireAuthenticatedUser } from '@/firebase/session'
 import { assertVendedorProprio } from '@/services/vendedores.service'
-=======
->>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
 import type { Intervalo } from '@/utils/date'
 import type { Venda } from '@/types'
 
 const col = () => collection(db, 'vendas')
 
-function toVenda(id: string, d: DocumentData): Venda {
+function toVenda(id: string, data: DocumentData): Venda {
   return {
     id,
-<<<<<<< HEAD
-    uid: d.uid,
-=======
->>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
-    vendedorId: d.vendedorId,
-    categoria: d.categoria,
-    quantidade: d.quantidade,
-    valor: d.valor,
-    data: d.data,
-    observacao: d.observacao,
-    createdAt: d.createdAt,
-    updatedAt: d.updatedAt,
+    ownerUid: data.ownerUid,
+    vendedorId: data.vendedorId,
+    categoria: data.categoria,
+    quantidade: data.quantidade,
+    valor: data.valor,
+    data: data.data,
+    observacao: data.observacao,
+    createdAt: data.createdAt,
+    updatedAt: data.updatedAt,
   }
 }
 
-/**
- * Vendas no intervalo [inicio, fim). O filtro por vendedor é feito no cliente:
- * `where('vendedorId', 'in', ...)` aceita no máx. 30 valores e raramente compensa.
- */
+/** Lista vendas no intervalo [inicio, fim), sempre limitadas ao proprietário. */
 export async function listarVendas({ inicio, fim }: Intervalo): Promise<Venda[]> {
-<<<<<<< HEAD
   const user = await requireAuthenticatedUser()
   const q = query(
     col(),
-    where('uid', '==', user.uid),
-=======
-  const q = query(
-    col(),
->>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
+    where('ownerUid', '==', user.uid),
     where('data', '>=', Timestamp.fromDate(inicio)),
     where('data', '<', Timestamp.fromDate(fim)),
     orderBy('data', 'desc'),
   )
   const snap = await getDocs(q)
-  return snap.docs.map((d) => toVenda(d.id, d.data()))
+  return snap.docs.map((document) => toVenda(document.id, document.data()))
 }
 
 export interface VendaInput {
@@ -77,14 +60,10 @@ export interface VendaInput {
 }
 
 export async function criarVenda(input: VendaInput): Promise<string> {
-<<<<<<< HEAD
   const user = await requireAuthenticatedUser()
   await assertVendedorProprio(input.vendedorId, user.uid)
   const ref = await addDoc(col(), {
-    uid: user.uid,
-=======
-  const ref = await addDoc(col(), {
->>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
+    ownerUid: user.uid,
     ...payload(input),
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
@@ -93,11 +72,10 @@ export async function criarVenda(input: VendaInput): Promise<string> {
 }
 
 export async function atualizarVenda(id: string, input: VendaInput): Promise<void> {
-<<<<<<< HEAD
   const user = await requireAuthenticatedUser()
   const ref = doc(col(), id)
   const snap = await getDoc(ref)
-  if (!snap.exists() || snap.data().uid !== user.uid) {
+  if (!snap.exists() || snap.data().ownerUid !== user.uid) {
     throw new Error('Venda não encontrada para este usuário')
   }
   if (snap.data().vendedorId !== input.vendedorId) {
@@ -111,17 +89,10 @@ export async function excluirVenda(id: string): Promise<void> {
   const user = await requireAuthenticatedUser()
   const ref = doc(col(), id)
   const snap = await getDoc(ref)
-  if (!snap.exists() || snap.data().uid !== user.uid) {
+  if (!snap.exists() || snap.data().ownerUid !== user.uid) {
     throw new Error('Venda não encontrada para este usuário')
   }
   await deleteDoc(ref)
-=======
-  await updateDoc(doc(col(), id), { ...payload(input), updatedAt: serverTimestamp() })
-}
-
-export async function excluirVenda(id: string): Promise<void> {
-  await deleteDoc(doc(col(), id))
->>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
 }
 
 function payload(input: VendaInput) {

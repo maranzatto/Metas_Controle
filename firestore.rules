@@ -1,113 +1,90 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-
     function signedIn() {
       return request.auth != null;
     }
 
-<<<<<<< HEAD
+    function isOwner(ownerUid) {
+      return signedIn() && ownerUid == request.auth.uid;
+    }
+
     function ownsVendedor(vendedorId) {
       return signedIn()
         && exists(/databases/$(database)/documents/vendedores/$(vendedorId))
-        && get(/databases/$(database)/documents/vendedores/$(vendedorId)).data.uid == request.auth.uid;
-    }
-
-    function validVenda(data) {
-      return data.vendedorId is string
-        && data.categoria in
-          ['POS', 'CONTROLE', 'FIXA', 'APARELHO', 'ACESSORIOS', 'NOVOS_NEGOCIOS', 'SVA']
-        && data.quantidade is number
-        && data.quantidade >= 0
-        && (data.valor == null || data.valor is number)
-        && data.data is timestamp;
+        && get(/databases/$(database)/documents/vendedores/$(vendedorId)).data.ownerUid == request.auth.uid;
     }
 
     match /vendedores/{vendedorId} {
-      allow read: if signedIn() && resource.data.uid == request.auth.uid;
+      allow read: if isOwner(resource.data.ownerUid);
       allow create: if signedIn()
-        && request.resource.data.uid == request.auth.uid
-        && request.resource.data.keys()
-          .hasOnly(['uid', 'nome', 'email', 'telefone', 'ativo', 'createdAt', 'updatedAt'])
+        && request.resource.data.keys().hasAll(['ownerUid', 'nome', 'ativo'])
+        && request.resource.data.keys().hasOnly([
+          'ownerUid', 'nome', 'email', 'telefone', 'ativo', 'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.ownerUid == request.auth.uid
         && request.resource.data.nome is string
         && request.resource.data.ativo is bool
-        && (request.resource.data.email == null || request.resource.data.email is string)
-        && (request.resource.data.telefone == null || request.resource.data.telefone is string);
-      allow update: if signedIn()
-        && resource.data.uid == request.auth.uid
-        && request.resource.data.uid == resource.data.uid
-        && request.resource.data.keys()
-          .hasOnly(['uid', 'nome', 'email', 'telefone', 'ativo', 'createdAt', 'updatedAt'])
-=======
-    match /vendedores/{vendedorId} {
-      allow read: if signedIn();
-      allow create, update: if signedIn()
-        && request.resource.data.keys()
-          .hasOnly(['nome', 'email', 'telefone', 'ativo', 'createdAt', 'updatedAt'])
->>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
+        && (!('email' in request.resource.data) || request.resource.data.email == null || request.resource.data.email is string)
+        && (!('telefone' in request.resource.data) || request.resource.data.telefone == null || request.resource.data.telefone is string);
+      allow update: if isOwner(resource.data.ownerUid)
+        && request.resource.data.ownerUid == resource.data.ownerUid
+        && request.resource.data.keys().hasOnly([
+          'ownerUid', 'nome', 'email', 'telefone', 'ativo', 'createdAt', 'updatedAt'
+        ])
         && request.resource.data.nome is string
-        && request.resource.data.ativo is bool
-        && (request.resource.data.email == null || request.resource.data.email is string)
-        && (request.resource.data.telefone == null || request.resource.data.telefone is string);
-      // Sem delete: inativar via `ativo = false` preserva o histórico de vendas.
+        && request.resource.data.ativo is bool;
+      allow delete: if isOwner(resource.data.ownerUid);
 
       match /metas/{competencia} {
-<<<<<<< HEAD
         allow read: if ownsVendedor(vendedorId);
         allow create, update: if ownsVendedor(vendedorId)
-=======
-        allow read: if signedIn();
-        allow create, update: if signedIn()
->>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
           && request.resource.data.categorias is map
           && request.resource.data.competencia is string;
+        allow delete: if ownsVendedor(vendedorId);
       }
     }
 
     match /metasLoja/{competencia} {
-<<<<<<< HEAD
-      allow read: if signedIn() && resource.data.uid == request.auth.uid;
+      allow read: if isOwner(resource.data.ownerUid);
       allow create: if signedIn()
-        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.ownerUid == request.auth.uid
         && request.resource.data.categorias is map
         && request.resource.data.competencia is string;
-      allow update: if signedIn()
-        && resource.data.uid == request.auth.uid
-        && request.resource.data.uid == resource.data.uid
-=======
-      allow read: if signedIn();
-      allow create, update: if signedIn()
->>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
+      allow update: if isOwner(resource.data.ownerUid)
+        && request.resource.data.ownerUid == resource.data.ownerUid
         && request.resource.data.categorias is map
         && request.resource.data.competencia is string;
+      allow delete: if isOwner(resource.data.ownerUid);
     }
 
     match /vendas/{vendaId} {
-<<<<<<< HEAD
-      allow read: if signedIn() && resource.data.uid == request.auth.uid;
+      allow read: if isOwner(resource.data.ownerUid);
       allow create: if signedIn()
-        && request.resource.data.uid == request.auth.uid
-        && ownsVendedor(request.resource.data.vendedorId)
-        && validVenda(request.resource.data);
-      allow update: if signedIn()
-        && resource.data.uid == request.auth.uid
-        && request.resource.data.uid == resource.data.uid
-        && request.resource.data.vendedorId == resource.data.vendedorId
-        && ownsVendedor(request.resource.data.vendedorId)
-        && validVenda(request.resource.data);
-      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
-=======
-      allow read: if signedIn();
-      allow create, update: if signedIn()
+        && request.resource.data.ownerUid == request.auth.uid
         && request.resource.data.vendedorId is string
-        && request.resource.data.categoria in
-          ['POS', 'CONTROLE', 'FIXA', 'APARELHO', 'ACESSORIOS', 'NOVOS_NEGOCIOS', 'SVA']
+        && ownsVendedor(request.resource.data.vendedorId)
+        && request.resource.data.categoria in [
+          'POS', 'CONTROLE', 'FIXA', 'APARELHO', 'ACESSORIOS', 'NOVOS_NEGOCIOS', 'SVA'
+        ]
         && request.resource.data.quantidade is number
         && request.resource.data.quantidade >= 0
-        && (request.resource.data.valor == null || request.resource.data.valor is number)
+        && (!('valor' in request.resource.data) || request.resource.data.valor == null || request.resource.data.valor is number)
         && request.resource.data.data is timestamp;
-      allow delete: if signedIn();
->>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
+      allow update: if isOwner(resource.data.ownerUid)
+        && request.resource.data.ownerUid == resource.data.ownerUid
+        && request.resource.data.vendedorId is string
+        && request.resource.data.vendedorId == resource.data.vendedorId
+        && ownsVendedor(request.resource.data.vendedorId)
+        && request.resource.data.categoria in [
+          'POS', 'CONTROLE', 'FIXA', 'APARELHO', 'ACESSORIOS', 'NOVOS_NEGOCIOS', 'SVA'
+        ]
+        && request.resource.data.quantidade is number
+        && request.resource.data.quantidade >= 0
+        && (!('valor' in request.resource.data) || request.resource.data.valor == null || request.resource.data.valor is number)
+        && request.resource.data.data is timestamp;
+      allow delete: if isOwner(resource.data.ownerUid);
     }
   }
 }

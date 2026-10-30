@@ -3,18 +3,15 @@ import type { Categoria } from '@/constants/categorias'
 
 /** Metas mensais por categoria, sempre em valor (R$). */
 export interface MetaCategoria {
-  meta80: number // R$
-  meta100: number // R$
+  meta80: number
+  meta100: number
 }
 
 export type MetasPorCategoria = Record<Categoria, MetaCategoria>
 
 export interface Vendedor {
   id: string
-<<<<<<< HEAD
-  uid: string
-=======
->>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
+  ownerUid: string
   nome: string
   email?: string
   telefone?: string
@@ -23,31 +20,26 @@ export interface Vendedor {
   updatedAt: Timestamp
 }
 
-/**
- * Doc em vendedores/{vendedorId}/metas/{competencia}.
- * Subcoleção (em vez de mapa no doc do vendedor) permite metas diferentes a cada
- * mês sem inchar o documento principal, com leitura direta por id "YYYY-MM".
- */
+/** Doc em vendedores/{vendedorId}/metas/{competencia}. */
 export interface MetasVendedor {
-  competencia: string // "2026-10"
+  competencia: string
   categorias: MetasPorCategoria
   updatedAt: Timestamp
 }
 
-/** Doc em metasLoja/{competencia}: meta global da loja, mesmo formato do vendedor. */
-export type MetasLoja = MetasVendedor
+/** Meta global da loja, vinculada ao proprietário autenticado. */
+export interface MetasLoja extends MetasVendedor {
+  ownerUid: string
+}
 
 export interface Venda {
   id: string
-<<<<<<< HEAD
-  uid: string
-=======
->>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
+  ownerUid: string
   vendedorId: string
   categoria: Categoria
   quantidade: number
   valor?: number
-  data: Timestamp // apenas o dia da venda
+  data: Timestamp
   observacao?: string
   createdAt: Timestamp
   updatedAt: Timestamp

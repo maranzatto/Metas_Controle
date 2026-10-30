@@ -4,8 +4,7 @@
       "collectionGroup": "vendas",
       "queryScope": "COLLECTION",
       "fields": [
-<<<<<<< HEAD
-        { "fieldPath": "uid", "order": "ASCENDING" },
+        { "fieldPath": "ownerUid", "order": "ASCENDING" },
         { "fieldPath": "data", "order": "DESCENDING" }
       ]
     },
@@ -13,7 +12,7 @@
       "collectionGroup": "vendedores",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "uid", "order": "ASCENDING" },
+        { "fieldPath": "ownerUid", "order": "ASCENDING" },
         { "fieldPath": "nome", "order": "ASCENDING" }
       ]
     },
@@ -21,22 +20,9 @@
       "collectionGroup": "metasLoja",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "uid", "order": "ASCENDING" },
+        { "fieldPath": "ownerUid", "order": "ASCENDING" },
         { "fieldPath": "competencia", "order": "ASCENDING" }
       ]
-=======
-        { "fieldPath": "vendedorId", "order": "ASCENDING" },
-        { "fieldPath": "data", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "vendas",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "vendedorId", "order": "ASCENDING" },
-        { "fieldPath": "data", "order": "DESCENDING" }
-      ]
->>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
     }
   ],
   "fieldOverrides": []
