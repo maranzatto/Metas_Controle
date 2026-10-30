@@ -1,11 +1,16 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import { expandirCaixaIccid, ICCIDS_PER_PACKAGE, normalizarIccid } from '@/utils/iccid'
+import {
+  expandirCaixaIccid,
+  expandirPacoteIccid,
+  ICCIDS_PER_PACKAGE,
+  normalizarIccid,
+} from '@/utils/iccid'
 
 export interface GrupoChips {
   id: string
   caixaId: string
-  tipo: 'planilha' | 'caixa'
+  tipo: 'planilha' | 'caixa' | 'pacote' | 'unitario'
   titulo: string
   iccids: string[]
 }
@@ -66,7 +71,7 @@ export const useConferenciaStore = defineStore('conferencia', () => {
           grupo &&
           typeof grupo.id === 'string' &&
           typeof grupo.caixaId === 'string' &&
-          (grupo.tipo === 'caixa' || grupo.tipo === 'planilha') &&
+          (grupo.tipo === 'caixa' || grupo.tipo === 'pacote' || grupo.tipo === 'planilha' || grupo.tipo === 'unitario') &&
           typeof grupo.titulo === 'string' &&
           Array.isArray(grupo.iccids) &&
           grupo.iccids.every((iccid) => normalizarIccid(iccid) === iccid),
@@ -141,6 +146,42 @@ export const useConferenciaStore = defineStore('conferencia', () => {
     return { adicionados: numeros.length }
   }
 
+  function adicionarUnitario(entrada: string) {
+    const iccid = normalizarIccid(entrada)
+    if (!iccid) throw new Error('Informe um ICCID válido com 18 dígitos, com ou sem o prefixo 89.')
+    if (iccids.value.includes(iccid)) throw new Error('Este ICCID já está na conferência.')
+
+    const id = crypto.randomUUID()
+    grupos.value.push({
+      id,
+      caixaId: id,
+      tipo: 'unitario',
+      titulo: `Chip avulso ${grupos.value.filter((grupo) => grupo.tipo === 'unitario').length + 1}`,
+      iccids: [iccid],
+    })
+    persistir()
+    return iccid
+  }
+
+  function adicionarPacote(inicio: string, fim: string) {
+    const numeros = expandirPacoteIccid(inicio, fim)
+    const existentes = new Set(iccids.value)
+    if (numeros.some((iccid) => existentes.has(iccid))) {
+      throw new Error('Este pacote contém ICCIDs que já estão na conferência. Nenhum item foi adicionado.')
+    }
+
+    const id = crypto.randomUUID()
+    grupos.value.push({
+      id,
+      caixaId: id,
+      tipo: 'pacote',
+      titulo: `Pacote avulso ${grupos.value.filter((grupo) => grupo.tipo === 'pacote').length + 1}`,
+      iccids: numeros,
+    })
+    persistir()
+    return { adicionados: numeros.length }
+  }
+
   function registrarLeitura(entrada: string): ResultadoLeitura {
     const iccid = normalizarIccid(entrada)
     if (!iccid) {
@@ -203,6 +244,8 @@ export const useConferenciaStore = defineStore('conferencia', () => {
     carregar,
     adicionarColagem,
     adicionarCaixa,
+    adicionarPacote,
+    adicionarUnitario,
     registrarLeitura,
     desfazerUltimaLeitura,
     removerGrupo,

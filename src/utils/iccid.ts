@@ -11,19 +11,29 @@ export function normalizarIccid(valor: string): string | null {
   return new RegExp(`^\\d{${ICCID_DIGITS}}$`).test(canonico) ? canonico : null
 }
 
-/** Expande o intervalo inclusivo e exige exatamente 100 ICCIDs sequenciais. */
-export function expandirCaixaIccid(inicio: string, fim: string): string[] {
+/** Expande um intervalo inclusivo e exige a quantidade sequencial informada. */
+export function expandirFaixaIccid(inicio: string, fim: string, quantidade: number): string[] {
   const primeiro = normalizarIccid(inicio)
   const ultimo = normalizarIccid(fim)
   if (!primeiro || !ultimo) throw new Error('Informe ICCIDs válidos para início e fim.')
 
   const numeroInicial = BigInt(primeiro)
   const numeroFinal = BigInt(ultimo)
-  if (numeroFinal - numeroInicial + 1n !== BigInt(ICCIDS_PER_BOX)) {
-    throw new Error('O intervalo da caixa precisa conter exatamente 100 ICCIDs sequenciais.')
+  if (numeroFinal - numeroInicial + 1n !== BigInt(quantidade)) {
+    throw new Error(`O intervalo precisa conter exatamente ${quantidade} ICCIDs sequenciais.`)
   }
 
-  return Array.from({ length: ICCIDS_PER_BOX }, (_, indice) =>
+  return Array.from({ length: quantidade }, (_, indice) =>
     (numeroInicial + BigInt(indice)).toString().padStart(ICCID_DIGITS, '0'),
   )
+}
+
+/** Expande o intervalo inclusivo e exige exatamente 100 ICCIDs sequenciais. */
+export function expandirCaixaIccid(inicio: string, fim: string): string[] {
+  return expandirFaixaIccid(inicio, fim, ICCIDS_PER_BOX)
+}
+
+/** Expande o intervalo inclusivo e exige exatamente 10 ICCIDs sequenciais. */
+export function expandirPacoteIccid(inicio: string, fim: string): string[] {
+  return expandirFaixaIccid(inicio, fim, ICCIDS_PER_PACKAGE)
 }

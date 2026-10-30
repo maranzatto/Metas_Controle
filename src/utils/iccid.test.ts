@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { expandirCaixaIccid, normalizarIccid } from './iccid'
+import { expandirCaixaIccid, expandirPacoteIccid, normalizarIccid } from './iccid'
 
 const INICIO = '551094360122857072'
 
@@ -35,5 +35,17 @@ describe('expandirCaixaIccid', () => {
     expect(() => expandirCaixaIccid(INICIO, '551094360122857170')).toThrow(
       'exatamente 100',
     )
+  })
+})
+
+describe('expandirPacoteIccid', () => {
+  it('expande exatamente 10 ICCIDs sequenciais', () => {
+    const pacote = expandirPacoteIccid(INICIO, '551094360122857081')
+    expect(pacote).toHaveLength(10)
+    expect(pacote[9]).toBe('551094360122857081')
+  })
+
+  it('rejeita intervalo que não contém 10 unidades', () => {
+    expect(() => expandirPacoteIccid(INICIO, '551094360122857072')).toThrow('exatamente 10')
   })
 })
