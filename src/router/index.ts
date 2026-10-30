@@ -57,7 +57,7 @@ export const router = createRouter({
           path: 'conferencia',
           name: 'conferencia',
           component: () => import('@/features/conferencia/ConferenciaView.vue'),
-          meta: { title: 'CONFERENCIA' },
+          meta: { title: 'Conferência' },
         },
       ],
     },

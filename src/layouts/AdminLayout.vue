@@ -13,7 +13,7 @@ const links = [
   { to: '/vendas', label: 'Vendas' },
   { to: '/vendedores', label: 'Vendedores' },
   { to: '/metas', label: 'Metas' },
-  { to: '/conferencia', label: 'CONFERENCIA' },
+  { to: '/conferencia', label: 'Conferência' },
 ]
 
 function ativo(link: (typeof links)[number]) {
