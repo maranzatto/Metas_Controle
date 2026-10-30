@@ -16,6 +16,35 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/vendedores/$(vendedorId)).data.ownerUid == request.auth.uid;
     }
 
+    function validMetaCategoria(meta) {
+      return meta is map
+        && meta.keys().hasAll(['meta80', 'meta100'])
+        && meta.keys().hasOnly(['meta80', 'meta100'])
+        && meta.meta80 is number
+        && meta.meta100 is number
+        && meta.meta80 >= 0
+        && meta.meta100 >= meta.meta80;
+    }
+
+    function validMetas(data) {
+      return data.categorias is map
+        && data.categorias.keys().hasAll([
+          'POS', 'CONTROLE', 'FIXA', 'APARELHO', 'ACESSORIOS', 'NOVOS_NEGOCIOS', 'SVA'
+        ])
+        && data.categorias.keys().hasOnly([
+          'POS', 'CONTROLE', 'FIXA', 'APARELHO', 'ACESSORIOS', 'NOVOS_NEGOCIOS', 'SVA'
+        ])
+        && validMetaCategoria(data.categorias.POS)
+        && validMetaCategoria(data.categorias.CONTROLE)
+        && validMetaCategoria(data.categorias.FIXA)
+        && validMetaCategoria(data.categorias.APARELHO)
+        && validMetaCategoria(data.categorias.ACESSORIOS)
+        && validMetaCategoria(data.categorias.NOVOS_NEGOCIOS)
+        && validMetaCategoria(data.categorias.SVA)
+        && data.competencia is string
+        && data.competencia.matches('^[0-9]{4}-(0[1-9]|1[0-2])$');
+    }
+
     match /vendedores/{vendedorId} {
       allow read: if isOwner(resource.data.ownerUid);
       allow create: if signedIn()
@@ -25,6 +54,8 @@ service cloud.firestore {
         ])
         && request.resource.data.ownerUid == request.auth.uid
         && request.resource.data.nome is string
+        && request.resource.data.nome.size() > 0
+        && request.resource.data.nome.size() <= 100
         && request.resource.data.ativo is bool
         && (!('email' in request.resource.data) || request.resource.data.email == null || request.resource.data.email is string)
         && (!('telefone' in request.resource.data) || request.resource.data.telefone == null || request.resource.data.telefone is string);
@@ -34,14 +65,18 @@ service cloud.firestore {
           'ownerUid', 'nome', 'email', 'telefone', 'ativo', 'createdAt', 'updatedAt'
         ])
         && request.resource.data.nome is string
-        && request.resource.data.ativo is bool;
+        && request.resource.data.nome.size() > 0
+        && request.resource.data.nome.size() <= 100
+        && request.resource.data.ativo is bool
+        && (!('email' in request.resource.data) || request.resource.data.email == null || request.resource.data.email is string)
+        && (!('telefone' in request.resource.data) || request.resource.data.telefone == null || request.resource.data.telefone is string);
       allow delete: if isOwner(resource.data.ownerUid);
 
       match /metas/{competencia} {
         allow read: if ownsVendedor(vendedorId);
         allow create, update: if ownsVendedor(vendedorId)
-          && request.resource.data.categorias is map
-          && request.resource.data.competencia is string;
+          && validMetas(request.resource.data)
+          && request.resource.data.competencia == competencia;
         allow delete: if ownsVendedor(vendedorId);
       }
     }
@@ -50,12 +85,12 @@ service cloud.firestore {
       allow read: if isOwner(resource.data.ownerUid);
       allow create: if signedIn()
         && request.resource.data.ownerUid == request.auth.uid
-        && request.resource.data.categorias is map
-        && request.resource.data.competencia is string;
+        && validMetas(request.resource.data)
+        && request.resource.data.competencia == competencia;
       allow update: if isOwner(resource.data.ownerUid)
         && request.resource.data.ownerUid == resource.data.ownerUid
-        && request.resource.data.categorias is map
-        && request.resource.data.competencia is string;
+        && validMetas(request.resource.data)
+        && request.resource.data.competencia == competencia;
       allow delete: if isOwner(resource.data.ownerUid);
     }
 
@@ -63,26 +98,34 @@ service cloud.firestore {
       allow read: if isOwner(resource.data.ownerUid);
       allow create: if signedIn()
         && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.keys().hasAll([
+          'ownerUid', 'vendedorId', 'categoria', 'quantidade', 'valor', 'data'
+        ])
         && request.resource.data.vendedorId is string
         && ownsVendedor(request.resource.data.vendedorId)
         && request.resource.data.categoria in [
           'POS', 'CONTROLE', 'FIXA', 'APARELHO', 'ACESSORIOS', 'NOVOS_NEGOCIOS', 'SVA'
         ]
-        && request.resource.data.quantidade is number
-        && request.resource.data.quantidade >= 0
-        && (!('valor' in request.resource.data) || request.resource.data.valor == null || request.resource.data.valor is number)
+        && request.resource.data.quantidade is int
+        && request.resource.data.quantidade > 0
+        && request.resource.data.valor is number
+        && request.resource.data.valor >= 0
         && request.resource.data.data is timestamp;
       allow update: if isOwner(resource.data.ownerUid)
         && request.resource.data.ownerUid == resource.data.ownerUid
+        && request.resource.data.keys().hasAll([
+          'ownerUid', 'vendedorId', 'categoria', 'quantidade', 'valor', 'data'
+        ])
         && request.resource.data.vendedorId is string
         && request.resource.data.vendedorId == resource.data.vendedorId
         && ownsVendedor(request.resource.data.vendedorId)
         && request.resource.data.categoria in [
           'POS', 'CONTROLE', 'FIXA', 'APARELHO', 'ACESSORIOS', 'NOVOS_NEGOCIOS', 'SVA'
         ]
-        && request.resource.data.quantidade is number
-        && request.resource.data.quantidade >= 0
-        && (!('valor' in request.resource.data) || request.resource.data.valor == null || request.resource.data.valor is number)
+        && request.resource.data.quantidade is int
+        && request.resource.data.quantidade > 0
+        && request.resource.data.valor is number
+        && request.resource.data.valor >= 0
         && request.resource.data.data is timestamp;
       allow delete: if isOwner(resource.data.ownerUid);
     }

@@ -12,12 +12,25 @@ import {
 } from 'firebase/firestore'
 import { db } from '@/firebase'
 import { requireAuthenticatedUser } from '@/firebase/session'
+import { competenciaValida } from '@/utils/date'
+import { metasValidas } from '@/utils/metas'
 import type { MetasLoja, MetasPorCategoria, MetasVendedor, Vendedor } from '@/types'
 
 const col = () => collection(db, 'vendedores')
 const metaDoc = (vendedorId: string, competencia: string) =>
   doc(db, 'vendedores', vendedorId, 'metas', competencia)
 const metaLojaCol = () => collection(db, 'metasLoja')
+
+function validarCompetencia(competencia: string) {
+  if (!competenciaValida(competencia)) throw new Error('Informe uma competência válida (YYYY-MM)')
+}
+
+function validarMetas(competencia: string, categorias: MetasPorCategoria) {
+  validarCompetencia(competencia)
+  if (!metasValidas(categorias)) {
+    throw new Error('As metas devem ser numéricas, não negativas e 80% não pode superar 100%')
+  }
+}
 
 export async function assertVendedorProprio(vendedorId: string, ownerUid: string): Promise<void> {
   const snap = await getDoc(doc(col(), vendedorId))
@@ -61,6 +74,16 @@ export async function salvarVendedor(dados: {
   telefone?: string
   ativo: boolean
 }): Promise<string> {
+  const nome = dados.nome.trim()
+  const email = dados.email?.trim() ?? ''
+  const telefone = dados.telefone?.replace(/\D/g, '') ?? ''
+  if (!nome || nome.length > 100) throw new Error('Informe um nome com até 100 caracteres')
+  if (email && (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))) {
+    throw new Error('Informe um e-mail válido')
+  }
+  if (telefone && ![10, 11].includes(telefone.length)) {
+    throw new Error('Informe um telefone com DDD e número completo')
+  }
   const user = await requireAuthenticatedUser()
   const ref = dados.id ? doc(col(), dados.id) : doc(col())
   if (dados.id) await assertVendedorProprio(dados.id, user.uid)
@@ -68,8 +91,8 @@ export async function salvarVendedor(dados: {
     ref,
     {
       ownerUid: user.uid,
-      nome: dados.nome.trim(),
-      email: dados.email?.trim() || null,
+      nome,
+      email: email || null,
       telefone: dados.telefone?.trim() || null,
       ativo: dados.ativo,
       updatedAt: serverTimestamp(),
@@ -86,6 +109,7 @@ export async function salvarMetas(
   competencia: string,
   categorias: MetasPorCategoria,
 ): Promise<void> {
+  validarMetas(competencia, categorias)
   const user = await requireAuthenticatedUser()
   await assertVendedorProprio(vendedorId, user.uid)
   await setDoc(
@@ -99,6 +123,7 @@ export async function buscarMetas(
   vendedorId: string,
   competencia: string,
 ): Promise<MetasVendedor | null> {
+  validarCompetencia(competencia)
   const user = await requireAuthenticatedUser()
   await assertVendedorProprio(vendedorId, user.uid)
   const snap = await getDoc(metaDoc(vendedorId, competencia))
@@ -110,6 +135,7 @@ export async function buscarMetasDeVarios(
   vendedorIds: string[],
   competencia: string,
 ): Promise<Map<string, MetasVendedor>> {
+  validarCompetencia(competencia)
   const user = await requireAuthenticatedUser()
   await Promise.all(vendedorIds.map((id) => assertVendedorProprio(id, user.uid)))
   const resultados = await Promise.all(vendedorIds.map((id) => buscarMetas(id, competencia)))
@@ -125,6 +151,7 @@ export async function salvarMetaLoja(
   competencia: string,
   categorias: MetasPorCategoria,
 ): Promise<void> {
+  validarMetas(competencia, categorias)
   const user = await requireAuthenticatedUser()
   const existing = await buscarMetaLojaDoc(user.uid, competencia)
   const ref = existing?.ref ?? doc(metaLojaCol(), `${user.uid}_${competencia}`)
@@ -142,6 +169,7 @@ export async function salvarMetaLoja(
 }
 
 export async function buscarMetaLoja(competencia: string): Promise<MetasLoja | null> {
+  validarCompetencia(competencia)
   const user = await requireAuthenticatedUser()
   const snap = await buscarMetaLojaDoc(user.uid, competencia)
   return snap ? (snap.data() as MetasLoja) : null

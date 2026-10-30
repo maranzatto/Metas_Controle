@@ -4,7 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { CATEGORIAS, CATEGORIA_LABELS, type Categoria } from '@/constants/categorias'
 import { useVendedoresStore } from '@/stores/vendedores'
 import type { MetasPorCategoria } from '@/types'
-import { competenciaAtual } from '@/utils/date'
+import { competenciaAtual, competenciaValida } from '@/utils/date'
 import { formatarCompetencia } from '@/utils/format'
 import { moedaParaInput, parseMoeda } from '@/utils/masks'
 import { calcularMeta80, metasValidas, metasVazias } from '@/utils/metas'
@@ -75,27 +75,38 @@ function paraNumeros(): MetasPorCategoria {
 }
 
 async function carregarMetas() {
+  erro.value = ''
+  if (!competenciaValida(competencia.value)) {
+    erro.value = 'Informe um mês válido para carregar as metas.'
+    carregando.value = false
+    return
+  }
   carregando.value = true
-  const salvas = (
-    await (props.loja
-      ? store.buscarMetaLoja(competencia.value)
-      : store.buscarMetas(vendedorId, competencia.value))
-  )?.categorias
-  const form = formVazio()
-  const automatico = automaticoPorCategoria()
-  if (salvas) {
-    for (const c of CATEGORIAS) {
-      form[c].meta80 = salvas[c]?.meta80 ? moedaParaInput(salvas[c].meta80) : ''
-      form[c].meta100 = salvas[c]?.meta100 ? moedaParaInput(salvas[c].meta100) : ''
-      automatico[c] = !salvas[c]?.meta80
-      if (automatico[c] && form[c].meta100) {
-        form[c].meta80 = moedaParaInput(calcularMeta80(parseMoeda(form[c].meta100)))
+  try {
+    const salvas = (
+      await (props.loja
+        ? store.buscarMetaLoja(competencia.value)
+        : store.buscarMetas(vendedorId, competencia.value))
+    )?.categorias
+    const form = formVazio()
+    const automatico = automaticoPorCategoria()
+    if (salvas) {
+      for (const c of CATEGORIAS) {
+        form[c].meta80 = salvas[c]?.meta80 != null ? moedaParaInput(salvas[c].meta80) : ''
+        form[c].meta100 = salvas[c]?.meta100 != null ? moedaParaInput(salvas[c].meta100) : ''
+        automatico[c] = salvas[c]?.meta80 == null
+        if (automatico[c] && form[c].meta100) {
+          form[c].meta80 = moedaParaInput(calcularMeta80(parseMoeda(form[c].meta100)))
+        }
       }
     }
+    metas.value = form
+    meta80Automatica.value = automatico
+  } catch {
+    erro.value = 'Não foi possível carregar as metas.'
+  } finally {
+    carregando.value = false
   }
-  metas.value = form
-  meta80Automatica.value = automatico
-  carregando.value = false
 }
 
 onMounted(async () => {
@@ -106,6 +117,17 @@ onMounted(async () => {
 watch(competencia, carregarMetas)
 
 async function salvar() {
+  if (!competenciaValida(competencia.value)) {
+    erro.value = 'Informe um mês válido antes de salvar.'
+    return
+  }
+  const categoriaIncompleta = CATEGORIAS.find(
+    (categoria) => !metas.value[categoria].meta80.trim() || !metas.value[categoria].meta100.trim(),
+  )
+  if (categoriaIncompleta) {
+    erro.value = `Preencha as metas 80% e 100% de ${CATEGORIA_LABELS[categoriaIncompleta]}. Use 0,00 se não houver meta para a categoria.`
+    return
+  }
   const numeros = paraNumeros()
   if (!metasValidas(numeros)) {
     erro.value = 'Revise as metas: a meta de 100% deve ser maior ou igual à de 80%.'
@@ -151,7 +173,7 @@ async function salvar() {
         </div>
       </div>
       <div class="flex items-end gap-2">
-        <BaseInput v-model="competencia" label="Mês" type="month" class="w-40" />
+        <BaseInput v-model="competencia" label="Mês" type="month" class="w-40" required />
         <BaseButton
           variant="secondary"
           @click="router.push({ name: props.loja ? 'metas' : 'vendedores' })"
@@ -186,6 +208,7 @@ async function salvar() {
                 label="Meta 80% (R$)"
                 mask="currency"
                 placeholder="0,00"
+                required
               />
               <button
                 v-if="!meta80Automatica[c]"
@@ -203,13 +226,14 @@ async function salvar() {
               label="Meta 100% (R$)"
               mask="currency"
               placeholder="0,00"
+              required
             />
           </div>
         </section>
       </div>
 
       <p class="text-xs text-brand-900/50">
-        Metas em valor (R$). Deixe em branco para ignorar a categoria.
+        Informe os valores em R$. Para categorias sem meta, use 0,00.
       </p>
     </template>
   </div>

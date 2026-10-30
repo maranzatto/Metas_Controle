@@ -132,4 +132,10 @@ describe('metasValidas', () => {
     m.SVA = { meta80: Number.NaN, meta100: 10 }
     expect(metasValidas(m)).toBe(false)
   })
+
+  it('rejeita categoria ausente', () => {
+    const m = metasVazias()
+    delete (m as Partial<MetasPorCategoria>).POS
+    expect(metasValidas(m)).toBe(false)
+  })
 })

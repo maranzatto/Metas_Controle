@@ -16,7 +16,8 @@ import {
 import { db } from '@/firebase'
 import { requireAuthenticatedUser } from '@/firebase/session'
 import { assertVendedorProprio } from '@/services/vendedores.service'
-import type { Intervalo } from '@/utils/date'
+import { dataInputValida, toDateInput, type Intervalo } from '@/utils/date'
+import { CATEGORIAS } from '@/constants/categorias'
 import type { Venda } from '@/types'
 
 const col = () => collection(db, 'vendas')
@@ -39,6 +40,15 @@ function toVenda(id: string, data: DocumentData): Venda {
 /** Lista vendas no intervalo [inicio, fim), sempre limitadas ao proprietário. */
 export async function listarVendas({ inicio, fim }: Intervalo): Promise<Venda[]> {
   const user = await requireAuthenticatedUser()
+  if (
+    !(inicio instanceof Date) ||
+    !(fim instanceof Date) ||
+    !Number.isFinite(inicio.getTime()) ||
+    !Number.isFinite(fim.getTime()) ||
+    inicio >= fim
+  ) {
+    throw new Error('Informe um intervalo de datas válido')
+  }
   const q = query(
     col(),
     where('ownerUid', '==', user.uid),
@@ -54,12 +64,27 @@ export interface VendaInput {
   vendedorId: string
   categoria: Venda['categoria']
   quantidade: number
-  valor?: number
+  valor: number
   data: Date
   observacao?: string
 }
 
+function validarVenda(input: VendaInput): void {
+  if (!input.vendedorId.trim()) throw new Error('Selecione um vendedor')
+  if (!CATEGORIAS.includes(input.categoria)) throw new Error('Categoria inválida')
+  if (!Number.isInteger(input.quantidade) || input.quantidade <= 0) {
+    throw new Error('A quantidade deve ser um inteiro maior que zero')
+  }
+  if (!Number.isFinite(input.valor) || input.valor < 0) {
+    throw new Error('Informe um valor válido para a venda')
+  }
+  if (!(input.data instanceof Date) || !dataInputValida(toDateInput(input.data))) {
+    throw new Error('Informe uma data válida para a venda')
+  }
+}
+
 export async function criarVenda(input: VendaInput): Promise<string> {
+  validarVenda(input)
   const user = await requireAuthenticatedUser()
   await assertVendedorProprio(input.vendedorId, user.uid)
   const ref = await addDoc(col(), {
@@ -72,6 +97,7 @@ export async function criarVenda(input: VendaInput): Promise<string> {
 }
 
 export async function atualizarVenda(id: string, input: VendaInput): Promise<void> {
+  validarVenda(input)
   const user = await requireAuthenticatedUser()
   const ref = doc(col(), id)
   const snap = await getDoc(ref)
@@ -100,7 +126,7 @@ function payload(input: VendaInput) {
     vendedorId: input.vendedorId,
     categoria: input.categoria,
     quantidade: input.quantidade,
-    valor: input.valor ?? null,
+    valor: input.valor,
     data: Timestamp.fromDate(input.data),
     observacao: input.observacao?.trim() || null,
   }

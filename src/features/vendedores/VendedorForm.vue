@@ -36,6 +36,19 @@ async function salvar() {
     erro.value = 'Informe o nome do vendedor.'
     return
   }
+  if (nome.value.trim().length > 100) {
+    erro.value = 'O nome do vendedor deve ter no máximo 100 caracteres.'
+    return
+  }
+  if (email.value.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
+    erro.value = 'Informe um e-mail válido.'
+    return
+  }
+  const digitosTelefone = telefone.value.replace(/\D/g, '')
+  if (digitosTelefone && ![10, 11].includes(digitosTelefone.length)) {
+    erro.value = 'Informe um telefone com DDD e número completo.'
+    return
+  }
   salvando.value = true
   try {
     await store.salvar({

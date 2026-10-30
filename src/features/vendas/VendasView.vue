@@ -5,7 +5,7 @@ import { CATEGORIA_LABELS } from '@/constants/categorias'
 import { useVendasStore } from '@/stores/vendas'
 import { useVendedoresStore } from '@/stores/vendedores'
 import type { Venda } from '@/types'
-import { competenciaAtual, intervaloMes, formatarData } from '@/utils/date'
+import { competenciaAtual, competenciaValida, intervaloMes, formatarData } from '@/utils/date'
 import { formatarMoeda, formatarNumero } from '@/utils/format'
 import type { VendaInput } from '@/services/vendas.service'
 import BaseButton from '@/components/ui/BaseButton.vue'
@@ -52,6 +52,10 @@ function mensagemErroCarregamento(error: unknown) {
 
 async function carregarListagem() {
   erroCarregamento.value = ''
+  if (!competenciaValida(competencia.value)) {
+    erroCarregamento.value = 'Informe um mês válido para listar as vendas.'
+    return
+  }
   try {
     await vendedoresStore.carregar()
     await vendasStore.carregar(intervalo.value)
@@ -101,7 +105,7 @@ async function confirmarExclusao() {
       class="flex flex-wrap items-end justify-between gap-3 rounded-2xl border border-brand-100 bg-white p-4 shadow-sm"
     >
       <div class="flex flex-wrap items-end gap-3">
-        <BaseInput v-model="competencia" label="Mês" type="month" />
+        <BaseInput v-model="competencia" label="Mês" type="month" required />
         <BaseSelect v-model="filtroVendedor" label="Vendedor">
           <option value="">Todos</option>
           <option v-for="v in vendedoresStore.lista" :key="v.id" :value="v.id">{{ v.nome }}</option>

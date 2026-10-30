@@ -3,7 +3,7 @@ import { ref, watch } from 'vue'
 import { CATEGORIAS, CATEGORIA_LABELS, type Categoria } from '@/constants/categorias'
 import { useVendedoresStore } from '@/stores/vendedores'
 import type { Venda } from '@/types'
-import { fromDateInput, toDateInput } from '@/utils/date'
+import { dataInputValida, fromDateInput, toDateInput } from '@/utils/date'
 import { moedaParaInput, parseMoeda } from '@/utils/masks'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
@@ -18,7 +18,7 @@ const emit = defineEmits<{
       vendedorId: string
       categoria: Categoria
       quantidade: number
-      valor?: number
+      valor: number
       data: Date
       observacao?: string
     },
@@ -57,18 +57,30 @@ async function salvar() {
     return
   }
   const qtd = Number(quantidade.value)
-  if (!Number.isFinite(qtd) || qtd < 0) {
-    erro.value = 'Quantidade deve ser um número maior ou igual a zero.'
+  if (!Number.isInteger(qtd) || qtd <= 0) {
+    erro.value = 'Informe uma quantidade inteira maior que zero.'
+    return
+  }
+  if (!valor.value.trim()) {
+    erro.value = 'Informe o valor da venda.'
+    return
+  }
+  if (!dataInputValida(data.value)) {
+    erro.value = 'Informe uma data válida para a venda.'
     return
   }
   const valorNumerico = parseMoeda(valor.value)
+  if (!Number.isFinite(valorNumerico) || valorNumerico < 0) {
+    erro.value = 'Informe um valor válido para a venda.'
+    return
+  }
   salvando.value = true
   try {
     emit('save', {
       vendedorId: vendedorId.value,
       categoria: categoria.value,
       quantidade: qtd,
-      valor: valorNumerico > 0 ? valorNumerico : undefined,
+      valor: valorNumerico,
       data: fromDateInput(data.value),
       observacao: observacao.value || undefined,
     })
@@ -94,7 +106,7 @@ async function salvar() {
         </BaseSelect>
 
         <BaseInput v-model="quantidade" label="Quantidade" mask="int" required />
-        <BaseInput v-model="valor" label="Valor (R$, opcional)" mask="currency" placeholder="0,00" />
+        <BaseInput v-model="valor" label="Valor (R$)" mask="currency" placeholder="0,00" required />
         <BaseInput v-model="data" label="Data" type="date" required />
       </div>
 

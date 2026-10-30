@@ -24,7 +24,7 @@ const idsAtivos = ref<string[]>([])
 
 // A Home é sempre visão loja: usa a meta global da loja quando existir.
 const usarMetaLoja = ref(true)
-const { linhas, vendas, carregando, intervalo, competenciaEfetiva } = useResultados(
+const { linhas, vendas, carregando, erro, intervalo, competenciaEfetiva } = useResultados(
   periodo,
   dataRef,
   competencia,
@@ -157,10 +157,12 @@ onMounted(async () => {
             {{ p.label }}
           </button>
         </div>
-        <BaseInput v-if="periodo !== 'mes'" v-model="dataRef" type="date" class="w-36" />
-        <BaseInput v-else v-model="competencia" type="month" class="w-40" />
+        <BaseInput v-if="periodo !== 'mes'" v-model="dataRef" type="date" class="w-36" required />
+        <BaseInput v-else v-model="competencia" type="month" class="w-40" required />
       </div>
     </section>
+
+    <p v-if="erro" class="text-sm font-medium text-rose-600">{{ erro }}</p>
 
     <!-- KPIs -->
     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

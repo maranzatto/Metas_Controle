@@ -8,6 +8,20 @@ export function competenciaAtual(): string {
   return competenciaDeData(new Date())
 }
 
+export function competenciaValida(valor: string): boolean {
+  const correspondencia = /^(\d{4})-(\d{2})$/.exec(valor)
+  if (!correspondencia) return false
+  const ano = Number(correspondencia[1])
+  const mes = Number(correspondencia[2])
+  return ano > 0 && mes >= 1 && mes <= 12
+}
+
+export function dataInputValida(valor: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(valor)) return false
+  const data = new Date(`${valor}T00:00:00.000Z`)
+  return Number.isFinite(data.getTime()) && data.toISOString().slice(0, 10) === valor
+}
+
 export function diasNoMes(competencia: string): number {
   const [ano, mes] = competencia.split('-').map(Number)
   return new Date(ano, mes, 0).getDate()

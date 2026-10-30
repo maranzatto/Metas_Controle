@@ -83,8 +83,8 @@ const FAIXA_TEXTO = {
           </button>
         </div>
 
-        <BaseInput v-if="periodo !== 'mes'" v-model="dataRef" label="Data de referência" type="date" />
-        <BaseInput v-else v-model="competencia" label="Mês de referência" type="month" />
+        <BaseInput v-if="periodo !== 'mes'" v-model="dataRef" label="Data de referência" type="date" required />
+        <BaseInput v-else v-model="competencia" label="Mês de referência" type="month" required />
 
         <div class="flex rounded-xl bg-brand-100/70 p-1">
           <button

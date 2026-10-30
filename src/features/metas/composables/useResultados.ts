@@ -5,6 +5,8 @@ import { listarVendas } from '@/services/vendas.service'
 import type { Venda } from '@/types'
 import {
   competenciaDeData,
+  competenciaValida,
+  dataInputValida,
   fromDateInput,
   intervaloDia,
   intervaloMes,
@@ -61,9 +63,24 @@ export function useResultados(
   })
 
   async function recarregar() {
+    const referenciaValida =
+      periodo.value === 'mes'
+        ? competenciaValida(competencia.value)
+        : dataInputValida(dataRef.value)
+    if (!referenciaValida) {
+      linhas.value = []
+      vendas.value = []
+      erro.value = periodo.value === 'mes'
+        ? 'Informe um mês válido para consultar os resultados.'
+        : 'Informe uma data válida para consultar os resultados.'
+      carregando.value = false
+      return
+    }
     if (vendedorIds.value.length === 0) {
       linhas.value = []
       vendas.value = []
+      erro.value = ''
+      carregando.value = false
       return
     }
     carregando.value = true

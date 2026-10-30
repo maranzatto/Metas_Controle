@@ -81,12 +81,14 @@ export function metasVazias(): MetasPorCategoria {
 }
 
 export function metasValidas(metas: MetasPorCategoria): boolean {
-  return CATEGORIAS.every(
-    (c) =>
-      metas[c].meta80 >= 0 &&
-      metas[c].meta100 >= 0 &&
-      Number.isFinite(metas[c].meta80) &&
-      Number.isFinite(metas[c].meta100) &&
-      metas[c].meta100 >= metas[c].meta80,
-  )
+  return CATEGORIAS.every((categoria) => {
+    const meta = metas?.[categoria]
+    return (
+      !!meta &&
+      Number.isFinite(meta.meta80) &&
+      Number.isFinite(meta.meta100) &&
+      meta.meta80 >= 0 &&
+      meta.meta100 >= meta.meta80
+    )
+  })
 }
