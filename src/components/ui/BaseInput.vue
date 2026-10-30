@@ -5,6 +5,7 @@ defineProps<{
   label?: string
   type?: string
   placeholder?: string
+  inputmode?: 'none' | 'text' | 'tel' | 'url' | 'email' | 'numeric' | 'decimal' | 'search'
   required?: boolean
   min?: number | string
   step?: number | string
@@ -23,7 +24,7 @@ const model = defineModel<string | number>({ default: '' })
       v-model="model"
       v-mask="mask"
       :type="type ?? 'text'"
-      :inputmode="mask === 'currency' || mask === 'int' ? 'numeric' : undefined"
+      :inputmode="inputmode ?? (mask === 'currency' || mask === 'int' ? 'numeric' : undefined)"
       :placeholder="placeholder"
       :required="required"
       :min="min"

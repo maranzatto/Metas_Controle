@@ -53,6 +53,12 @@ export const router = createRouter({
           props: { loja: true },
           meta: { title: 'Metas da loja' },
         },
+        {
+          path: 'conferencia',
+          name: 'conferencia',
+          component: () => import('@/features/conferencia/ConferenciaView.vue'),
+          meta: { title: 'CONFERENCIA' },
+        },
       ],
     },
     { path: '/:pathMatch(.*)*', redirect: '/' },
