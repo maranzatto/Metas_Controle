@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
+import { FirebaseError } from 'firebase/app'
 import { CATEGORIA_LABELS } from '@/constants/categorias'
 import { useVendasStore } from '@/stores/vendas'
 import { useVendedoresStore } from '@/stores/vendedores'
@@ -24,6 +25,7 @@ const formAberto = ref(false)
 const editando = ref<Venda | null>(null)
 const excluindo = ref<Venda | null>(null)
 const erro = ref('')
+const erroCarregamento = ref('')
 
 const lista = computed(() =>
   filtroVendedor.value
@@ -35,12 +37,32 @@ function nomeVendedor(id: string) {
   return vendedoresStore.porId.get(id)?.nome ?? '—'
 }
 
-onMounted(async () => {
-  await vendedoresStore.carregar()
-  await vendasStore.carregar(intervalo.value)
-})
+function mensagemErroCarregamento(error: unknown) {
+  if (error instanceof FirebaseError) {
+    if (error.code === 'failed-precondition') {
+      return 'O índice de vendas ainda não está disponível. Publique os índices do Firestore e tente novamente.'
+    }
+    if (error.code === 'permission-denied') {
+      return 'O Firestore negou a consulta. Confira as regras publicadas e o ownerUid dos documentos.'
+    }
+    return `Falha ao carregar vendas (${error.code}).`
+  }
+  return 'Não foi possível carregar as vendas.'
+}
 
-watch(intervalo, (i) => vendasStore.carregar(i))
+async function carregarListagem() {
+  erroCarregamento.value = ''
+  try {
+    await vendedoresStore.carregar()
+    await vendasStore.carregar(intervalo.value)
+  } catch (error) {
+    erroCarregamento.value = mensagemErroCarregamento(error)
+  }
+}
+
+onMounted(carregarListagem)
+
+watch(intervalo, carregarListagem)
 
 function nova() {
   editando.value = null
@@ -89,6 +111,9 @@ async function confirmarExclusao() {
     </div>
 
     <p v-if="erro" class="text-sm font-medium text-rose-600">{{ erro }}</p>
+    <p v-if="erroCarregamento" class="text-sm font-medium text-rose-600">
+      {{ erroCarregamento }}
+    </p>
 
     <section
       class="overflow-x-auto rounded-2xl border border-brand-100 bg-white shadow-sm shadow-brand-100"
@@ -108,6 +133,11 @@ async function confirmarExclusao() {
         <tbody>
           <tr v-if="vendasStore.carregando">
             <td colspan="7" class="px-5 py-10 text-center text-brand-300">Carregando…</td>
+          </tr>
+          <tr v-else-if="erroCarregamento">
+            <td colspan="7" class="px-5 py-10 text-center text-rose-600">
+              A listagem não foi carregada.
+            </td>
           </tr>
           <tr v-else-if="lista.length === 0">
             <td colspan="7" class="px-5 py-10 text-center text-brand-300">
