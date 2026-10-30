@@ -7,16 +7,24 @@ import {
   query,
   serverTimestamp,
   setDoc,
+<<<<<<< HEAD
   where,
   type DocumentData,
 } from 'firebase/firestore'
 import { db } from '@/firebase'
 import { requireAuthenticatedUser } from '@/firebase/session'
+=======
+  writeBatch,
+  type DocumentData,
+} from 'firebase/firestore'
+import { db } from '@/firebase'
+>>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
 import type { MetasLoja, MetasPorCategoria, MetasVendedor, Vendedor } from '@/types'
 
 const col = () => collection(db, 'vendedores')
 const metaDoc = (vendedorId: string, competencia: string) =>
   doc(db, 'vendedores', vendedorId, 'metas', competencia)
+<<<<<<< HEAD
 const metaLojaCol = () => collection(db, 'metasLoja')
 
 export async function assertVendedorProprio(vendedorId: string, uid: string): Promise<void> {
@@ -33,11 +41,17 @@ async function buscarMetaLojaDoc(uid: string, competencia: string) {
   if (snap.size > 1) throw new Error('Existem metas duplicadas para esta competência')
   return snap.docs[0]
 }
+=======
+const metaLojaDoc = (competencia: string) => doc(db, 'metasLoja', competencia)
+>>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
 
 function toVendedor(id: string, d: DocumentData): Vendedor {
   return {
     id,
+<<<<<<< HEAD
     uid: d.uid,
+=======
+>>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
     nome: d.nome,
     email: d.email ?? undefined,
     telefone: d.telefone ?? undefined,
@@ -48,8 +62,12 @@ function toVendedor(id: string, d: DocumentData): Vendedor {
 }
 
 export async function listarVendedores(): Promise<Vendedor[]> {
+<<<<<<< HEAD
   const user = await requireAuthenticatedUser()
   const snap = await getDocs(query(col(), where('uid', '==', user.uid), orderBy('nome')))
+=======
+  const snap = await getDocs(query(col(), orderBy('nome')))
+>>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
   return snap.docs.map((d) => toVendedor(d.id, d.data()))
 }
 
@@ -61,6 +79,7 @@ export async function salvarVendedor(dados: {
   telefone?: string
   ativo: boolean
 }): Promise<string> {
+<<<<<<< HEAD
   const user = await requireAuthenticatedUser()
   const ref = dados.id ? doc(col(), dados.id) : doc(col())
   if (dados.id) await assertVendedorProprio(dados.id, user.uid)
@@ -68,6 +87,13 @@ export async function salvarVendedor(dados: {
     ref,
     {
       uid: user.uid,
+=======
+  const batch = writeBatch(db)
+  const ref = dados.id ? doc(col(), dados.id) : doc(col())
+  batch.set(
+    ref,
+    {
+>>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
       nome: dados.nome.trim(),
       email: dados.email?.trim() || null,
       telefone: dados.telefone?.trim() || null,
@@ -77,6 +103,10 @@ export async function salvarVendedor(dados: {
     },
     { merge: true },
   )
+<<<<<<< HEAD
+=======
+  await batch.commit()
+>>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
   return ref.id
 }
 
@@ -86,8 +116,11 @@ export async function salvarMetas(
   competencia: string,
   categorias: MetasPorCategoria,
 ): Promise<void> {
+<<<<<<< HEAD
   const user = await requireAuthenticatedUser()
   await assertVendedorProprio(vendedorId, user.uid)
+=======
+>>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
   await setDoc(
     metaDoc(vendedorId, competencia),
     { competencia, categorias, updatedAt: serverTimestamp() },
@@ -99,8 +132,11 @@ export async function buscarMetas(
   vendedorId: string,
   competencia: string,
 ): Promise<MetasVendedor | null> {
+<<<<<<< HEAD
   const user = await requireAuthenticatedUser()
   await assertVendedorProprio(vendedorId, user.uid)
+=======
+>>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
   const snap = await getDoc(metaDoc(vendedorId, competencia))
   return snap.exists() ? (snap.data() as MetasVendedor) : null
 }
@@ -110,6 +146,7 @@ export async function buscarMetasDeVarios(
   vendedorIds: string[],
   competencia: string,
 ): Promise<Map<string, MetasVendedor>> {
+<<<<<<< HEAD
   const user = await requireAuthenticatedUser()
   const vendedores = await Promise.all(
     vendedorIds.map(async (id) => {
@@ -120,6 +157,11 @@ export async function buscarMetasDeVarios(
   const resultados = await Promise.all(vendedores.map((id) => buscarMetas(id, competencia)))
   const mapa = new Map<string, MetasVendedor>()
   vendedores.forEach((id, i) => {
+=======
+  const resultados = await Promise.all(vendedorIds.map((id) => buscarMetas(id, competencia)))
+  const mapa = new Map<string, MetasVendedor>()
+  vendedorIds.forEach((id, i) => {
+>>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
     if (resultados[i]) mapa.set(id, resultados[i])
   })
   return mapa
@@ -130,6 +172,7 @@ export async function salvarMetaLoja(
   competencia: string,
   categorias: MetasPorCategoria,
 ): Promise<void> {
+<<<<<<< HEAD
   const user = await requireAuthenticatedUser()
   const existing = await buscarMetaLojaDoc(user.uid, competencia)
   const ref = existing?.ref ?? doc(metaLojaCol(), `${user.uid}_${competencia}`)
@@ -142,12 +185,22 @@ export async function salvarMetaLoja(
       updatedAt: serverTimestamp(),
       ...(!existing ? { createdAt: serverTimestamp() } : {}),
     },
+=======
+  await setDoc(
+    metaLojaDoc(competencia),
+    { competencia, categorias, updatedAt: serverTimestamp() },
+>>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
     { merge: true },
   )
 }
 
 export async function buscarMetaLoja(competencia: string): Promise<MetasLoja | null> {
+<<<<<<< HEAD
   const user = await requireAuthenticatedUser()
   const snap = await buscarMetaLojaDoc(user.uid, competencia)
   return snap ? (snap.data() as MetasLoja) : null
+=======
+  const snap = await getDoc(metaLojaDoc(competencia))
+  return snap.exists() ? (snap.data() as MetasLoja) : null
+>>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
 }

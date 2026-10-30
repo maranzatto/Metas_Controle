@@ -1,6 +1,11 @@
+<<<<<<< HEAD
 import { computed, ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { useAuthStore } from '@/stores/auth'
+=======
+import { computed, ref } from 'vue'
+import { defineStore } from 'pinia'
+>>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
 import type { Vendedor } from '@/types'
 import {
   buscarMetaLoja,
@@ -12,7 +17,10 @@ import {
 } from '@/services/vendedores.service'
 
 export const useVendedoresStore = defineStore('vendedores', () => {
+<<<<<<< HEAD
   const auth = useAuthStore()
+=======
+>>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
   const lista = ref<Vendedor[]>([])
   const carregando = ref(false)
   const carregado = ref(false)
@@ -20,6 +28,7 @@ export const useVendedoresStore = defineStore('vendedores', () => {
   const ativos = computed(() => lista.value.filter((v) => v.ativo))
   const porId = computed(() => new Map(lista.value.map((v) => [v.id, v])))
 
+<<<<<<< HEAD
   watch(
     () => auth.user?.uid,
     () => {
@@ -46,6 +55,16 @@ export const useVendedoresStore = defineStore('vendedores', () => {
       }
     } finally {
       if (auth.user?.uid === uid) carregando.value = false
+=======
+  async function carregar(force = false) {
+    if (carregado.value && !force) return
+    carregando.value = true
+    try {
+      lista.value = await listarVendedores()
+      carregado.value = true
+    } finally {
+      carregando.value = false
+>>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
     }
   }
 

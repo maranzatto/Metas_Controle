@@ -10,8 +10,12 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",
+<<<<<<< HEAD
     "format": "prettier --write .",
     "migrate:legacy-uid": "node scripts/migrate-legacy-uid.mjs"
+=======
+    "format": "prettier --write ."
+>>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
   },
   "dependencies": {
     "firebase": "^11.10.0",
@@ -26,7 +30,10 @@
     "@vue/eslint-config-typescript": "^14.6.0",
     "eslint": "^9.33.0",
     "eslint-plugin-vue": "^10.4.0",
+<<<<<<< HEAD
     "firebase-admin": "^12.7.0",
+=======
+>>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
     "prettier": "^3.6.2",
     "tailwindcss": "^4.1.12",
     "typescript": "~5.9.2",

@@ -3,7 +3,10 @@ import {
   collection,
   deleteDoc,
   doc,
+<<<<<<< HEAD
   getDoc,
+=======
+>>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
   getDocs,
   orderBy,
   query,
@@ -14,8 +17,11 @@ import {
   type DocumentData,
 } from 'firebase/firestore'
 import { db } from '@/firebase'
+<<<<<<< HEAD
 import { requireAuthenticatedUser } from '@/firebase/session'
 import { assertVendedorProprio } from '@/services/vendedores.service'
+=======
+>>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
 import type { Intervalo } from '@/utils/date'
 import type { Venda } from '@/types'
 
@@ -24,7 +30,10 @@ const col = () => collection(db, 'vendas')
 function toVenda(id: string, d: DocumentData): Venda {
   return {
     id,
+<<<<<<< HEAD
     uid: d.uid,
+=======
+>>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
     vendedorId: d.vendedorId,
     categoria: d.categoria,
     quantidade: d.quantidade,
@@ -41,10 +50,15 @@ function toVenda(id: string, d: DocumentData): Venda {
  * `where('vendedorId', 'in', ...)` aceita no máx. 30 valores e raramente compensa.
  */
 export async function listarVendas({ inicio, fim }: Intervalo): Promise<Venda[]> {
+<<<<<<< HEAD
   const user = await requireAuthenticatedUser()
   const q = query(
     col(),
     where('uid', '==', user.uid),
+=======
+  const q = query(
+    col(),
+>>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
     where('data', '>=', Timestamp.fromDate(inicio)),
     where('data', '<', Timestamp.fromDate(fim)),
     orderBy('data', 'desc'),
@@ -63,10 +77,14 @@ export interface VendaInput {
 }
 
 export async function criarVenda(input: VendaInput): Promise<string> {
+<<<<<<< HEAD
   const user = await requireAuthenticatedUser()
   await assertVendedorProprio(input.vendedorId, user.uid)
   const ref = await addDoc(col(), {
     uid: user.uid,
+=======
+  const ref = await addDoc(col(), {
+>>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
     ...payload(input),
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
@@ -75,6 +93,7 @@ export async function criarVenda(input: VendaInput): Promise<string> {
 }
 
 export async function atualizarVenda(id: string, input: VendaInput): Promise<void> {
+<<<<<<< HEAD
   const user = await requireAuthenticatedUser()
   const ref = doc(col(), id)
   const snap = await getDoc(ref)
@@ -96,6 +115,13 @@ export async function excluirVenda(id: string): Promise<void> {
     throw new Error('Venda não encontrada para este usuário')
   }
   await deleteDoc(ref)
+=======
+  await updateDoc(doc(col(), id), { ...payload(input), updatedAt: serverTimestamp() })
+}
+
+export async function excluirVenda(id: string): Promise<void> {
+  await deleteDoc(doc(col(), id))
+>>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
 }
 
 function payload(input: VendaInput) {

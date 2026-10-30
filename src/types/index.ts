@@ -11,7 +11,10 @@ export type MetasPorCategoria = Record<Categoria, MetaCategoria>
 
 export interface Vendedor {
   id: string
+<<<<<<< HEAD
   uid: string
+=======
+>>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
   nome: string
   email?: string
   telefone?: string
@@ -36,7 +39,10 @@ export type MetasLoja = MetasVendedor
 
 export interface Venda {
   id: string
+<<<<<<< HEAD
   uid: string
+=======
+>>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
   vendedorId: string
   categoria: Categoria
   quantidade: number

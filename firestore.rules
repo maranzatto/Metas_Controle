@@ -6,6 +6,7 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+<<<<<<< HEAD
     function ownsVendedor(vendedorId) {
       return signedIn()
         && exists(/databases/$(database)/documents/vendedores/$(vendedorId))
@@ -37,6 +38,13 @@ service cloud.firestore {
         && request.resource.data.uid == resource.data.uid
         && request.resource.data.keys()
           .hasOnly(['uid', 'nome', 'email', 'telefone', 'ativo', 'createdAt', 'updatedAt'])
+=======
+    match /vendedores/{vendedorId} {
+      allow read: if signedIn();
+      allow create, update: if signedIn()
+        && request.resource.data.keys()
+          .hasOnly(['nome', 'email', 'telefone', 'ativo', 'createdAt', 'updatedAt'])
+>>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
         && request.resource.data.nome is string
         && request.resource.data.ativo is bool
         && (request.resource.data.email == null || request.resource.data.email is string)
@@ -44,14 +52,20 @@ service cloud.firestore {
       // Sem delete: inativar via `ativo = false` preserva o histórico de vendas.
 
       match /metas/{competencia} {
+<<<<<<< HEAD
         allow read: if ownsVendedor(vendedorId);
         allow create, update: if ownsVendedor(vendedorId)
+=======
+        allow read: if signedIn();
+        allow create, update: if signedIn()
+>>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
           && request.resource.data.categorias is map
           && request.resource.data.competencia is string;
       }
     }
 
     match /metasLoja/{competencia} {
+<<<<<<< HEAD
       allow read: if signedIn() && resource.data.uid == request.auth.uid;
       allow create: if signedIn()
         && request.resource.data.uid == request.auth.uid
@@ -60,11 +74,16 @@ service cloud.firestore {
       allow update: if signedIn()
         && resource.data.uid == request.auth.uid
         && request.resource.data.uid == resource.data.uid
+=======
+      allow read: if signedIn();
+      allow create, update: if signedIn()
+>>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
         && request.resource.data.categorias is map
         && request.resource.data.competencia is string;
     }
 
     match /vendas/{vendaId} {
+<<<<<<< HEAD
       allow read: if signedIn() && resource.data.uid == request.auth.uid;
       allow create: if signedIn()
         && request.resource.data.uid == request.auth.uid
@@ -77,6 +96,18 @@ service cloud.firestore {
         && ownsVendedor(request.resource.data.vendedorId)
         && validVenda(request.resource.data);
       allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+=======
+      allow read: if signedIn();
+      allow create, update: if signedIn()
+        && request.resource.data.vendedorId is string
+        && request.resource.data.categoria in
+          ['POS', 'CONTROLE', 'FIXA', 'APARELHO', 'ACESSORIOS', 'NOVOS_NEGOCIOS', 'SVA']
+        && request.resource.data.quantidade is number
+        && request.resource.data.quantidade >= 0
+        && (request.resource.data.valor == null || request.resource.data.valor is number)
+        && request.resource.data.data is timestamp;
+      allow delete: if signedIn();
+>>>>>>> fd676deb5e8cac857d419617d908a0ff5fbfa9b1
     }
   }
 }
