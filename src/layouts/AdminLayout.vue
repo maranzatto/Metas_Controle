@@ -7,6 +7,7 @@ const auth = useAuthStore()
 const route = useRoute()
 const router = useRouter()
 const sidebarAberta = ref(false)
+const vivoLogo = `${import.meta.env.BASE_URL}vivo-logo.svg`
 
 interface LinkNavegacao {
   to: string
@@ -58,13 +59,8 @@ async function sair() {
       :class="{ 'translate-x-0': sidebarAberta }"
     >
       <div class="flex h-16 items-center gap-3 border-b border-white/10 px-5">
-        <div
-          class="flex size-9 items-center justify-center rounded-xl bg-vivo-500"
-        >
-          <svg class="size-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 17l6-6 4 4 8-8" />
-            <path d="M17 7h4v4" />
-          </svg>
+        <div class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-white p-1">
+          <img :src="vivoLogo" alt="Vivo" class="size-full object-contain" />
         </div>
         <span class="text-base font-extrabold tracking-tight text-white">Painel da Loja</span>
       </div>
