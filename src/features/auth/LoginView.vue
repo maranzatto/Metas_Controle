@@ -7,6 +7,7 @@ import { useAuthStore } from '@/stores/auth'
 const auth = useAuthStore()
 const route = useRoute()
 const router = useRouter()
+const vivoLogo = `${import.meta.env.BASE_URL}vivo-logo.svg`
 
 const CHAVE_EMAIL = 'painel.ultimoEmail'
 
@@ -53,7 +54,7 @@ async function entrar() {
       <div
         class="absolute inset-0 opacity-[0.035]"
         style="
-          background-image: linear-gradient(#315f7e 1px, transparent 1px), linear-gradient(90deg, #315f7e 1px, transparent 1px);
+          background-image: linear-gradient(#886b9b 1px, transparent 1px), linear-gradient(90deg, #886b9b 1px, transparent 1px);
           background-size: 36px 36px;
         "
       />
@@ -64,13 +65,8 @@ async function entrar() {
       @submit.prevent="entrar"
     >
       <div class="mb-8 flex flex-col items-center text-center">
-        <div
-          class="mb-4 flex size-14 items-center justify-center rounded-xl bg-brand-700"
-        >
-          <svg class="size-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 17l6-6 4 4 8-8" />
-            <path d="M17 7h4v4" />
-          </svg>
+        <div class="mb-4 flex size-16 items-center justify-center rounded-2xl border border-brand-200 bg-white p-2 shadow-sm">
+          <img :src="vivoLogo" alt="Vivo" class="size-full object-contain" />
         </div>
         <h1 class="text-2xl font-extrabold tracking-tight text-brand-950">Painel da Loja</h1>
         <p class="mt-1 text-sm text-brand-600">Metas e vendas em um só lugar</p>

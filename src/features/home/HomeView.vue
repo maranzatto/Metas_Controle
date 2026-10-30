@@ -38,7 +38,7 @@ const PERIODOS: { valor: Periodo; label: string }[] = [
   { valor: 'mes', label: 'Mês' },
 ]
 
-const CORES = ['#315f7e', '#168a9a', '#548b7c', '#73899b', '#a0a9b5', '#4f8795', '#7f927a']
+const CORES = ['#5a416b', '#78658a', '#698b8c', '#9a879e', '#798a93', '#8d7694', '#75918a']
 
 /* ---- KPIs (todos em R$, pois as metas são monetárias) ---- */
 const totalValor = computed(() => vendas.value.reduce((acc, v) => acc + (v.valor ?? 0), 0))
@@ -187,7 +187,7 @@ onMounted(async () => {
       >
         <div class="flex items-center gap-3">
           <div
-            class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-sky-100 text-sky-700"
+            class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-100 text-brand-700"
           >
             <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
           </div>

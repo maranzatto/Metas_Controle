@@ -41,8 +41,8 @@ const passoLabel = computed(() => Math.ceil(props.points.length / 10))
     <svg :viewBox="`0 0 ${W} ${H}`" class="min-w-[560px]">
       <defs>
         <linearGradient id="gradArea" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#315f7e" stop-opacity="0.24" />
-          <stop offset="100%" stop-color="#315f7e" stop-opacity="0.02" />
+          <stop offset="0%" stop-color="#5a416b" stop-opacity="0.24" />
+          <stop offset="100%" stop-color="#5a416b" stop-opacity="0.02" />
         </linearGradient>
       </defs>
 
@@ -63,7 +63,7 @@ const passoLabel = computed(() => Math.ceil(props.points.length / 10))
           :x2="W"
           :y1="yDe(meta)"
           :y2="yDe(meta)"
-          stroke="#168a9a"
+          stroke="#698b8c"
           stroke-width="1.5"
           stroke-dasharray="6 4"
         />
@@ -81,7 +81,7 @@ const passoLabel = computed(() => Math.ceil(props.points.length / 10))
       <polyline
         :points="linha"
         fill="none"
-        stroke="#315f7e"
+        stroke="#5a416b"
         stroke-width="2.5"
         stroke-linejoin="round"
         stroke-linecap="round"
@@ -93,7 +93,7 @@ const passoLabel = computed(() => Math.ceil(props.points.length / 10))
         :cy="p.y"
         r="3.5"
         fill="#fff"
-        stroke="#315f7e"
+        stroke="#5a416b"
         stroke-width="2"
       >
         <title>{{ p.label }}: {{ fmt(p.value) }}</title>

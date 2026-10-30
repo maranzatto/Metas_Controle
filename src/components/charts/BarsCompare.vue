@@ -44,8 +44,8 @@ const linhasGuia = computed(() => [0.25, 0.5, 0.75, 1].map((f) => BASE - f * ALT
     <svg :viewBox="`0 0 ${W} ${H}`" class="min-w-[560px]">
       <defs>
         <linearGradient id="gradBar" x1="0" y1="1" x2="0" y2="0">
-          <stop offset="0%" stop-color="#315f7e" />
-          <stop offset="100%" stop-color="#168a9a" />
+          <stop offset="0%" stop-color="#5a416b" />
+          <stop offset="100%" stop-color="#698b8c" />
         </linearGradient>
       </defs>
 

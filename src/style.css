@@ -3,20 +3,20 @@
 @theme {
     --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
 
-    /* Azul institucional suave com neutros frios. */
-    --color-brand-50: #f5f8fb;
-    --color-brand-100: #eaf0f5;
-    --color-brand-200: #d5e1eb;
-    --color-brand-300: #b6cadb;
-    --color-brand-400: #8eacc5;
-    --color-brand-500: #648eae;
-    --color-brand-600: #477595;
-    --color-brand-700: #315f7e;
-    --color-brand-800: #244c68;
-    --color-brand-900: #1b3c54;
-    --color-brand-950: #122b3e;
-    --color-vivo-500: #168a9a;
-    --color-vivo-600: #127383;
+    /* Roxo plum dessaturado com lavanda clara para superfícies. */
+    --color-brand-50: #f8f6fa;
+    --color-brand-100: #f0ebf4;
+    --color-brand-200: #e2d9e9;
+    --color-brand-300: #c9b8d5;
+    --color-brand-400: #a88eb8;
+    --color-brand-500: #886b9b;
+    --color-brand-600: #6f527f;
+    --color-brand-700: #5a416b;
+    --color-brand-800: #473356;
+    --color-brand-900: #382843;
+    --color-brand-950: #281d31;
+    --color-vivo-500: #698b8c;
+    --color-vivo-600: #557475;
 }
 
 /* ---- animações ---- */
@@ -93,5 +93,5 @@
 }
 
 body {
-    background: #f5f7fa;
+    background: #f8f6fa;
 }
